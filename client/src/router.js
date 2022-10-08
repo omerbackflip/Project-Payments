@@ -8,6 +8,11 @@ export default new Router({
   routes: [
     {
       path: "/",
+      name: "main-view",
+      component: () => import("./components/MainView")
+    },
+    {
+      path: "/payments",
       name: "paymentList",
       component: () => import("./components/PaymentsList")
     },

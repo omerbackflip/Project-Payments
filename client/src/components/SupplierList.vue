@@ -28,6 +28,9 @@
 						<v-btn @click="updateSupplier(item)" x-small>
 							<v-icon small>mdi-pencil</v-icon>
 						</v-btn>
+						<v-btn class="ml-1" @click="deleteSupplier(item.id)" x-small>
+							<v-icon small>mdi-delete</v-icon>
+						</v-btn>
 					</template>
 
 				</v-data-table>
@@ -54,7 +57,7 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
-
+		<confirm-dialog ref="confirm"/>
 	</div>
 </template>
 
@@ -63,9 +66,11 @@
 <script>
 import { SUPPLIER_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
+import ConfirmDialog from './Common/ConfirmDialog.vue';
 
 export default {
 	name: "supplier-list",
+	components: { ConfirmDialog },
 	data() {
 		return {
 			suppliers: [],
@@ -99,6 +104,18 @@ export default {
 			this.supplier = {name: item.name , budget: item.budget};
 			this.dialog = true;
 			this.update = item.id;
+		},
+		async deleteSupplier(id) {
+			try {
+				if(id) {
+					if(await this.$refs.confirm.open( "Confirm", "Are you sure to delete this supplier? This will also delete all related payments")){
+						await apiService.deleteOne({ id , model: SUPPLIER_MODEL});
+						this.getSuppliers();
+					}
+				}
+			} catch (error) {
+				console.log(error);		
+			}
 		},
 		async submitSupplier() {
 			try {

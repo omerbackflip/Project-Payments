@@ -48,6 +48,7 @@
         <template v-if="dialog">
             <Payment :onPaymentFormClose="onPaymentFormClose" :supplierList="supplierList" title="New Payment" :paymentToUpdate="null"/>
         </template>
+        <confirm-dialog ref="confirm"/>
     </nav>
     
 </template>
@@ -55,19 +56,20 @@
 <script>
 import { PAYMENT_MODEL } from '../../constants/constants';
 import apiService from '../../services/apiService';
-
+import ConfirmDialog from './ConfirmDialog.vue';
 import ImportPayments from '../ImportPayments.vue';
 import Payment from '../Payment.vue';
 import PaymentsList from '../PaymentsList.vue';
 
 export default {
-    components: { ImportPayments,Payment, PaymentsList },
+    components: { ImportPayments,Payment, PaymentsList, ConfirmDialog },
     data() {
         return {
             drawer: false,
             openImportModal: false,
             links: [
-                {icon: 'mdi-cash-multiple', text: 'Payments', route: '/'},
+                {icon: 'mdi-view-dashboard', text: 'Main View', route: '/'},
+                {icon: 'mdi-cash-multiple', text: 'Payments', route: '/payments'},
                 {icon: 'mdi-arrow-up-bold-box-outline', text: 'Import payments', route: null , onClick: this.toggleModal},
                 {icon: 'mdi-briefcase-check', text: 'Project list', route: '/project-list'},
                 {icon: 'mdi-account-multiple-check', text: 'Supplier list', route: '/supplier-list'},
@@ -110,7 +112,7 @@ export default {
             this.dialog = false;
         },
         async deleteAllPayments() {
-            if(window.confirm("Are you sure you want to delete all supplier's payments?")) {
+            if(await this.$refs.confirm.open( "Confirm", "Are you sure you want to delete all supplier's payments?")) {
                 await apiService.deleteAll({model: PAYMENT_MODEL});
                 window.location.reload();
             }

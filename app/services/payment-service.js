@@ -45,3 +45,11 @@ exports.getSuppliersToSave = (payments) => {
     }
     return suppliers;
 }
+
+exports.addPaymentToSupplierMiddleWare = async (model, payment) => {
+    if(payment && payment._id) {
+        await model.updateOne({name: payment.supplier} , 
+            { $push: { payments: payment._id } },            
+        );
+    }
+}

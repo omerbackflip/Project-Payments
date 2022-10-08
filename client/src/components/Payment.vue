@@ -107,7 +107,7 @@ export default {
                 if (this.paymentToUpdate) {
                     apiService.update(this.payment.id, this.payment, {model: PAYMENT_MODEL });
                 } else {
-                    apiService.create(this.payment , {model: PAYMENT_MODEL});
+                    apiService.create(this.payment , {model: PAYMENT_MODEL , middleware: 'addPaymentToSupplierMiddleWare'});
                 }
             this.dialog = false;   
             } catch (error) {

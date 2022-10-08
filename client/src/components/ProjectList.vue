@@ -28,6 +28,9 @@
 						<v-btn @click="updateProject(item)" x-small>
 							<v-icon small>mdi-pencil</v-icon>
 						</v-btn>
+						<v-btn class="ml-1" @click="deleteProject(item.id)" x-small>
+							<v-icon small>mdi-delete</v-icon>
+						</v-btn>
 					</template>
 
 				</v-data-table>
@@ -54,7 +57,7 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
-
+		<confirm-dialog ref="confirm"/>
 	</div>
 </template>
 
@@ -63,9 +66,12 @@
 <script>
 import { PROJECT_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
+import specificServiceEndPoints from '../services/specificServiceEndPoints';
+import ConfirmDialog from './Common/ConfirmDialog.vue';
 
 export default {
 	name: "project-list",
+	components: { ConfirmDialog },
 	data() {
 		return {
 			projects: [],
@@ -99,6 +105,18 @@ export default {
 			this.project = {name: item.name , budget: item.budget};
 			this.dialog = true;
 			this.update = item.id;
+		},
+		async deleteProject(id) {
+			try {
+				if(id) {
+					if(await this.$refs.confirm.open( "Confirm", "Are you sure to delete this project? This will also delete all related payments")){
+						await specificServiceEndPoints.deleteProjectAndCorrespondingData(id);
+						this.getProjects();
+					}
+				}
+			} catch (error) {
+				console.log(error);		
+			}
 		},
 		async submitProject() {
 			try {

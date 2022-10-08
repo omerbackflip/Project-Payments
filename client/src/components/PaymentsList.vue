@@ -70,8 +70,8 @@
                     <v-btn @click="paymentToUpdate = item" x-small>
                         <v-icon small>mdi-pencil</v-icon>
                     </v-btn>
-                    <v-btn x-small>
-                      <v-icon small @click="deleteItem(item.id)"
+                    <v-btn x-small @click="deleteItem(item.id)">
+                      <v-icon small 
                         >mdi-delete</v-icon
                       >
                     </v-btn>
@@ -98,6 +98,7 @@
             :paymentToUpdate="paymentToUpdate" 
         />
     </template>
+    <confirm-dialog ref="confirm"/>
   </div>
 </template>
 
@@ -105,9 +106,10 @@
 import { SUPPLIER_MODEL,PAYMENT_MODEL } from '../constants/constants';
 import apiService from "../services/apiService";
 import Payment from "./Payment.vue";
+import ConfirmDialog from './Common/ConfirmDialog.vue';
 
 export default {
-    components: { Payment },
+    components: { Payment, ConfirmDialog },
     name: "payments-list",
     props: ["noData"],
     data() {
@@ -117,15 +119,15 @@ export default {
             supplierList: [],
             paymentToUpdate: null,
             headers: [
-                { text: 'Project', value: 'project' },
-				{ text: 'Amount', value: 'amount' },
-                { text: 'Vat', value: 'vat' },
-                { text: 'Payment Method', value: 'paymentMethod' },
-                { text: 'Remarks', value: 'remark' },
-                { text: 'Supplier', value: 'supplier' },
-                { text: 'Invoice ID', value: 'invoiceId' },
-                { text: 'Date', value: 'date' },
-				{ text: 'Controls', value: 'controls' },
+              { text: 'Project', value: 'project' },
+              { text: 'Amount', value: 'amount' },
+              { text: 'Vat', value: 'vat' },
+              { text: 'Payment Method', value: 'paymentMethod' },
+              { text: 'Remarks', value: 'remark' },
+              { text: 'Supplier', value: 'supplier' },
+              { text: 'Invoice ID', value: 'invoiceId' },
+              { text: 'Date', value: 'date' },
+              { text: 'Controls', value: 'controls' },
             ],
             budget: [],
             selectedSupplier: "All",
@@ -168,7 +170,7 @@ export default {
         async deleteItem(id) {
             try {
                 console.log(id);
-                if (window.confirm("Are you sure you want to delete this item?")) {
+                if (await this.$refs.confirm.open( "Confirm", "Are you sure you want to delete this item?")) {
                     await apiService.deleteOne({ model: PAYMENT_MODEL , id});
                     this.retrievePayments();
                 }
