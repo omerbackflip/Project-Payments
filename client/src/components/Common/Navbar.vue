@@ -58,7 +58,7 @@ import { PAYMENT_MODEL } from '../../constants/constants';
 import apiService from '../../services/apiService';
 import ConfirmDialog from './ConfirmDialog.vue';
 import ImportPayments from '../ImportPayments.vue';
-import Payment from '../Payment.vue';
+import Payment from '../PaymentForm.vue';
 import PaymentsList from '../PaymentsList.vue';
 
 export default {

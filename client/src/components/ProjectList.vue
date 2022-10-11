@@ -14,7 +14,7 @@
 						<v-toolbar flat>
 							<v-toolbar-title>All Projects</v-toolbar-title>
 							<v-spacer></v-spacer>
-							<v-btn @click="dialog = true">
+							<v-btn @click="updateProject()">
 								<v-icon class="nav-icon" small >mdi-plus</v-icon>
 								New Project
 							</v-btn>
@@ -37,27 +37,9 @@
 			</v-card>
 		</v-layout>
 
-		<v-dialog v-model="dialog" width="500">
-			<v-card>
-				<v-card-title class="text-h5 grey lighten-2">
-					{{!update ? 'New' : 'Update'}} Project
-				</v-card-title>
-				<div class="field-margin" v-show="showMessage">
-					{{message}}
-				</div>
-				<v-text-field class="field-margin" v-model="project.name" label="Name"></v-text-field>
-				<v-text-field class="field-margin" v-model="project.budget" label="Budget"></v-text-field>
-
-				<v-divider></v-divider>
-
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn color="primary" text @click="dialog = false"> Close </v-btn>
-					<v-btn :disabled = "!project.name" color="primary" text @click="submitProject()"> Submit </v-btn>
-				</v-card-actions>
-			</v-card>
-		</v-dialog>
 		<confirm-dialog ref="confirm"/>
+		<project-form ref="projectForm"/>
+
 	</div>
 </template>
 
@@ -68,21 +50,14 @@ import { PROJECT_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
 import ConfirmDialog from './Common/ConfirmDialog.vue';
+import ProjectForm from './ProjectForm.vue';
 
 export default {
 	name: "project-list",
-	components: { ConfirmDialog },
+	components: { ConfirmDialog, ProjectForm },
 	data() {
 		return {
 			projects: [],
-			project: {
-				budget: '',
-				name: '',
-			},
-			update: 0,
-			dialog: false,
-			showMessage: false,
-			message: '',
 			headers: [
 				{ text: 'Name', value: 'name' },
 				{ text: 'Budget', value: 'budget' },
@@ -101,11 +76,6 @@ export default {
 				console.log(error);
 			}
 		},
-		updateProject(item) {
-			this.project = {name: item.name , budget: item.budget};
-			this.dialog = true;
-			this.update = item.id;
-		},
 		async deleteProject(id) {
 			try {
 				if(id) {
@@ -118,28 +88,15 @@ export default {
 				console.log(error);		
 			}
 		},
-		async submitProject() {
-			try {
-				let response;
-				if(!this.update) {
-					response = await apiService.create(this.project , {model:PROJECT_MODEL});
-				} else {
-					response = await apiService.update(this.update , this.project , {model:PROJECT_MODEL});
-				}
-				if(response.data) {
-					this.message = 'Project successfully created/updated!';
-					this.showMessage = true;
-					this.getProjects();
-					this.update = 0;
-					setTimeout(() => {
-						this.dialog = false;
-						this.showMessage = false;
-					}, 2000);
-				}
-			} catch (error) {
-				console.log(error);
+		updateProject(item) {
+			let project = {name: '', budget: 0};
+			let update = 0;
+			if(item) {
+				project = {name: item.name , budget: item.budget};
+				update = item.id;
 			}
-		}
+			this.$refs.projectForm.open(project,update);
+		},
 	},
 	mounted() {
 		this.getProjects();

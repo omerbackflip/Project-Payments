@@ -84,7 +84,7 @@ export default {
 			message: '',
 			headers: [
 				{ text: 'Name', value: 'name' },
-				{ text: 'Budget', value: 'budget' },
+				{ text: 'Budget', value: 'totalBudget' },
 				{ text: 'Date Created', value: 'createdAt' },
 				{ text: 'Controls', value: 'controls' },
 			],
@@ -95,7 +95,13 @@ export default {
 		async getSuppliers() {
 			try {
 				const response = await apiService.get({model: SUPPLIER_MODEL});
-				this.suppliers = response.data;
+				if(response && response.data) {
+					this.suppliers = response.data.map(supplier => {
+						let totalBudget = 0;
+						supplier.budgets.forEach(item => { totalBudget+=item.budget });
+						return { ...supplier , totalBudget };
+					});
+				}
 			} catch (error) {
 				console.log(error);
 			}

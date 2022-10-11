@@ -105,7 +105,7 @@
 <script>
 import { SUPPLIER_MODEL,PAYMENT_MODEL } from '../constants/constants';
 import apiService from "../services/apiService";
-import Payment from "./Payment.vue";
+import Payment from "./PaymentForm.vue";
 import ConfirmDialog from './Common/ConfirmDialog.vue';
 
 export default {

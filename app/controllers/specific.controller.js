@@ -59,17 +59,26 @@ exports.getMainViewProjectData = async (req, res) => {
 
                 ...projects.map(async project => {
                     project.suppliers = [];
-                    const payments = await Payment.find({project: project.name}).lean();
+                    let [payments,budgetForProject] = await Promise.all([
+                        Payment.find({project: project.name}).lean(),
+                        Supplier.findOne({"budgets.project": project._id}).lean()
+                    ]);
+
                     if(payments && payments.length) {
                         let index = -1;
 
-                        payments.map(payment => {
+                        payments.map(async payment => {
                             index = project.suppliers.findIndex(supplier => supplier.name === payment.supplier);
                             if(index >= 0) {
                                 project.suppliers[index].payments.push(payment);
                                 return;
                             }
-                            project.suppliers.push({name: payment.supplier , payments: [payment] });
+                            project.suppliers.push({
+                                name: payment.supplier , 
+                                payments: [payment], 
+                                budgetForProject: budgetForProject ? budgetForProject.budgets[0].budget : 0
+                            });
+                            budgetForProject = null;
                         });
 
                     }
@@ -84,6 +93,25 @@ exports.getMainViewProjectData = async (req, res) => {
     } catch (error) {
         console.log(error)
 		res.status(500).send({ message: "Error getting main view project data", error });
+    }
+}
+
+exports.addSupplierBudgetsToProject = async(req,res) => {
+    try {
+        const { projectId } = req.params;
+        const supplierBudgets = req.body;
+        if(supplierBudgets && supplierBudgets.length) {
+            await Promise.all( supplierBudgets.map( async item =>  {
+                return await Supplier.updateOne({ name: item.supplier } ,{
+                    $push: { budgets: { project: projectId, budget: item.budget } },
+                });
+            }));
+        }
+        return res.send({success: true, message: "Successfully added budgets to suppliers"});
+
+    } catch (error) {
+        console.log(error)
+		res.status(500).send({ message: "Error getting suppliers and their associated budgets", error });
     }
 }
 

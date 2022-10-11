@@ -5,10 +5,10 @@ module.exports = mongoose => {
 	const schema = mongoose.Schema(
 		{
 			name: String,
-			budgets: {
+			budgets: [{
 				project: {type: Schema.Types.ObjectId, ref: 'Project'},
-				value: {type: Number , default: 0},
-			},
+				budget: {type: Number , default: 0},
+			}],
 			payments: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
 		},
 		{ timestamps: true }

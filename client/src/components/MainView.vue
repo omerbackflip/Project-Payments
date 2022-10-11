@@ -17,7 +17,7 @@
 						<v-toolbar flat>
 							<v-toolbar-title>All Projects</v-toolbar-title>
 							<v-spacer></v-spacer>
-							<v-btn @click="dialog = true">
+							<v-btn @click="updateProject()">
 								<v-icon class="nav-icon" small >mdi-plus</v-icon>
 								New Project
 							</v-btn>
@@ -57,31 +57,6 @@
 				</v-data-table>
 			</v-card>
 		</v-layout>
-
-		<!-- Add/Update Project -->
-		<v-dialog v-model="dialog" width="500">
-			<v-card>
-				<v-card-title class="text-h5 grey lighten-2">
-					{{!update ? 'New' : 'Update'}} Project
-				</v-card-title>
-				<div class="field-margin" v-show="showMessage">
-					{{message}}
-				</div>
-				<v-text-field class="field-margin" v-model="project.name" label="Name"></v-text-field>
-				<v-text-field class="field-margin" v-model="project.budget" label="Budget"></v-text-field>
-
-				<v-divider></v-divider>
-
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn color="primary" text @click="dialog = false"> Close </v-btn>
-					<v-btn :disabled = "!project.name" color="primary" text @click="submitProject()"> Submit </v-btn>
-				</v-card-actions>
-			</v-card>
-		</v-dialog>
-
-		<!-- ----------------------- -->
-
 
 		<!-- View payments of supplier -->
 
@@ -130,21 +105,23 @@
 			/>
 		</template>
 		<confirm-dialog ref="confirm"/>
+		<project-form ref="projectForm"/>
 	</div>
 </template>
 
 
 
 <script>
-import { PAYMENT_MODEL, PROJECT_MODEL } from "../constants/constants";
+import { PAYMENT_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import ConfirmDialog from './Common/ConfirmDialog.vue';
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
-import Payment from "./Payment.vue";
+import Payment from "./PaymentForm.vue";
+import ProjectForm from './ProjectForm.vue';
 
 export default {
 	name: "main-view",
-	components: { ConfirmDialog, Payment },
+	components: { ConfirmDialog, Payment, ProjectForm },
 	data() {
 		return {
 			projects: [],
@@ -153,9 +130,7 @@ export default {
 				name: '',
 			},
 			expanded: [],
-			update: 0,
 			paymentToUpdate: null,
-			dialog: false,
 			selectedSupplier: {},
 			supplierPaymentsDialog: false,
 			showMessage: false,
@@ -168,7 +143,7 @@ export default {
 			],
 			supplierHeaders: [
 				{ text: 'Supplier Name', value: 'name' },
-				{ text: 'Supplier Budget for project', value: 'budget' },
+				{ text: 'Supplier Budget for project', value: 'budgetForProject' },
 			],
 			paymentsHeaders: [
 				{ text: 'Project', value: 'project' },
@@ -196,9 +171,11 @@ export default {
 			}
 		},
 		updateProject(item) {
-			this.project = {name: item.name , budget: item.budget};
-			this.dialog = true;
-			this.update = item.id;
+			if(item) {
+				this.project = {name: item.name , budget: item.budget};
+				this.update = item.id;
+			}
+			this.$refs.projectForm.open(this.project,this.update);
 		},
 		async deleteProject(id) {
 			try {
@@ -227,28 +204,6 @@ export default {
                 console.log(error);
             }
         },
-		async submitProject() {
-			try {
-				let response;
-				if(!this.update) {
-					response = await apiService.create(this.project , {model:PROJECT_MODEL});
-				} else {
-					response = await apiService.update(this.update , this.project , {model:PROJECT_MODEL});
-				}
-				if(response.data) {
-					this.message = 'Project successfully created/updated!';
-					this.showMessage = true;
-					this.getProjects();
-					this.update = 0;
-					setTimeout(() => {
-						this.dialog = false;
-						this.showMessage = false;
-					}, 2000);
-				}
-			} catch (error) {
-				console.log(error);
-			}
-		},
 		onPaymentFormClose() {
             this.paymentToUpdate = null;
         }

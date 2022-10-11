@@ -12,6 +12,7 @@ module.exports = app => {
   router.post("/save-payments",upload.single('file'), specific.savePaymentsBulk);
   router.put("/delete-project/:projectId" , specific.deleteProjectAndData);
   router.get("/main-view-project-data" , specific.getMainViewProjectData);
-
+  router.put("/add-supplier-budgets/:projectId" , specific.addSupplierBudgetsToProject);
+  
   app.use('/api/specific', router);
 };

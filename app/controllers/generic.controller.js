@@ -49,7 +49,7 @@ exports.update = async (req, res) => {
 		const id = req.params.id;
 		const data = await dbService.updateItem(db[req.query.model], {_id: id}, req.body);
 		if(data) {
-			res.send({ message: "entity was updated successfully." });
+			res.send({ data, message: "entity was updated successfully." });
 		} else {
 			res.status(404).send({message: `Cannot update entity with id=${id}. Maybe entity was not found!`});
 		}
