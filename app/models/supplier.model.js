@@ -1,15 +1,7 @@
-var mongoose = require('mongoose') 
-  , Schema = mongoose.Schema;
-
 module.exports = mongoose => {
 	const schema = mongoose.Schema(
 		{
 			name: String,
-			budgets: [{
-				project: {type: Schema.Types.ObjectId, ref: 'Project'},
-				budget: {type: Number , default: 0},
-			}],
-			payments: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
 		},
 		{ timestamps: true }
 	);

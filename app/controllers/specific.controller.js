@@ -6,20 +6,21 @@ const dbService = require("../services/db-service");
 const paymentService = require("../services/payment-service");
 const csv = require('csvtojson');
 const fs = require('fs');
+var mongoose = require('mongoose');
 
 exports.savePaymentsBulk = async (req, res) => {
 
 	try {
         await Promise.all([Project.remove(), Supplier.remove(), Payment.remove()]);
 		let data = await csv().fromFile(`uploads/${req.file.filename}`);
-        const {projects , payments} = paymentService.getProjectsAndProjectsToSave(data);
-        const [savedProjects , savedPayments] = await Promise.all([
-            dbService.insertMany(Project,projects),
+        const {suppliers , payments} = paymentService.getSuppliersAndPaymentsToSave(data);
+        const [savedSuppliers , savedPayments] = await Promise.all([
+            dbService.insertMany(Supplier,suppliers),
             dbService.insertMany(Payment,payments),
         ]);
 
-        const suppliers = paymentService.getSuppliersToSave(savedPayments);
-        await dbService.insertMany(Supplier,suppliers);
+        const projects = paymentService.getProjectsToSave(savedSuppliers , savedPayments);
+        await dbService.insertMany(Project,projects);
         unLinkFile(`uploads/${req.file.filename}`);
         return res.send({ success: true, message: "Data successfully Imported"});
 
@@ -52,43 +53,9 @@ exports.deleteProjectAndData = async (req, res) => {
 
 exports.getMainViewProjectData = async (req, res) => {
     try {
-        let projects = await Project.find().lean();
+        let projects = await Project.find().populate('suppliers.supplier').populate('suppliers.payments').lean();
         if( projects && projects.length) {
-
-            const data = await Promise.all([
-
-                ...projects.map(async project => {
-                    project.suppliers = [];
-                    let [payments,budgetForProject] = await Promise.all([
-                        Payment.find({project: project.name}).lean(),
-                        Supplier.findOne({"budgets.project": project._id}).lean()
-                    ]);
-
-                    if(payments && payments.length) {
-                        let index = -1;
-
-                        payments.map(async payment => {
-                            index = project.suppliers.findIndex(supplier => supplier.name === payment.supplier);
-                            if(index >= 0) {
-                                project.suppliers[index].payments.push(payment);
-                                return;
-                            }
-                            project.suppliers.push({
-                                name: payment.supplier , 
-                                payments: [payment], 
-                                budgetForProject: budgetForProject ? budgetForProject.budgets[0].budget : 0
-                            });
-                            budgetForProject = null;
-                        });
-
-                    }
-                    return project;
-                })
-
-            ]);
-
-            return res.send({success: true, projects: data});
-
+            return res.send({success: true, projects});
         }
     } catch (error) {
         console.log(error)
@@ -99,13 +66,16 @@ exports.getMainViewProjectData = async (req, res) => {
 exports.addSupplierBudgetsToProject = async(req,res) => {
     try {
         const { projectId } = req.params;
-        const supplierBudgets = req.body;
+        const supplierBudgets = req.body.map(item => {
+            return {
+                supplier: mongoose.Types.ObjectId(item.supplier),
+                budget: item.budget,
+                payments: item.payments
+            }
+        });
+
         if(supplierBudgets && supplierBudgets.length) {
-            await Promise.all( supplierBudgets.map( async item =>  {
-                return await Supplier.updateOne({ name: item.supplier } ,{
-                    $push: { budgets: { project: projectId, budget: item.budget } },
-                });
-            }));
+            await Project.updateOne({_id: projectId}, { suppliers: supplierBudgets });
         }
         return res.send({success: true, message: "Successfully added budgets to suppliers"});
 

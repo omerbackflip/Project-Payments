@@ -28,7 +28,7 @@
 						<v-btn @click="updateProject(item)" x-small>
 							<v-icon small>mdi-pencil</v-icon>
 						</v-btn>
-						<v-btn class="ml-1" @click="deleteProject(item.id)" x-small>
+						<v-btn class="ml-1" @click="deleteProject(item._id)" x-small>
 							<v-icon small>mdi-delete</v-icon>
 						</v-btn>
 					</template>
@@ -46,8 +46,6 @@
 
 
 <script>
-import { PROJECT_MODEL } from "../constants/constants";
-import apiService from "../services/apiService";
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
 import ConfirmDialog from './Common/ConfirmDialog.vue';
 import ProjectForm from './ProjectForm.vue';
@@ -70,8 +68,10 @@ export default {
 	methods: {
 		async getProjects() {
 			try {
-				const response = await apiService.get({model: PROJECT_MODEL});
-				this.projects = response.data;
+				const response = await specificServiceEndPoints.retrieveAllProjectsData();
+				if(response.data && response.data.success) {
+					this.projects = response.data.projects;
+				}			
 			} catch (error) {
 				console.log(error);
 			}
@@ -88,14 +88,10 @@ export default {
 				console.log(error);		
 			}
 		},
-		updateProject(item) {
-			let project = {name: '', budget: 0};
-			let update = 0;
-			if(item) {
-				project = {name: item.name , budget: item.budget};
-				update = item.id;
-			}
-			this.$refs.projectForm.open(project,update);
+		async updateProject(item) {
+			let newProject = item ? false : true;
+			await this.$refs.projectForm.open(item, newProject);
+			this.getProjects();
 		},
 	},
 	mounted() {

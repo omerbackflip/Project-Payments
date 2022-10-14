@@ -7,7 +7,7 @@
     >
         <v-card>
             <v-card-title class="text-h5 grey lighten-2">
-                {{!update ? 'New' : 'Update'}} Project
+                {{!project ? 'New' : 'Update'}} Project
             </v-card-title>
             <div class="field-margin" v-show="showMessage">
                 {{message}}
@@ -15,11 +15,12 @@
             <v-text-field class="field-margin" v-model="project.name" label="Name"></v-text-field>
             <v-text-field class="field-margin" v-model="project.budget" label="Budget"></v-text-field>
             <div class="budgets-wrapper">
+                <h3>Suppliers</h3>
                 <v-container>
-                    <div v-for="(textField, i) in supplierBudgets" :key="i" class="text-fields-row">
+                    <div v-for="(textField, i) in project.suppliers" :key="i" class="text-fields-row">
                         <v-row>
                             <v-col cols="4">
-                                <v-select class="mt-5" :items="currentSuppliers" v-model="textField.supplier" label="Supplier" dense></v-select>
+                                <v-select class="mt-5" :items="currentSuppliers" v-model="textField.name" label="Supplier" dense></v-select>
                             </v-col>
                             <v-col cols="4">
                                 <v-text-field label="Budget" v-model="textField.budget" ></v-text-field>
@@ -53,15 +54,13 @@ export default {
     name: "project-form",
     data() {
         return {
-            project: {
-				budget: '',
-				name: '',
-			},
-			supplierBudgets: [{ supplier: '', budget: 0 }],
             currentSuppliers: [],
-			update: 0,
+            allSuppliers: [],
+            project: {name: '' , budget: '', suppliers: []},
 			dialog: false,
+            resolve: null,
 			showMessage: false,
+            newProject: false,
 			message: '',
             options: {
                 color: "grey lighten-3",
@@ -74,26 +73,34 @@ export default {
         async submitProject() {
 			try {
 				let response;
-				if(!this.update) {
-					response = await apiService.create(this.project , {model:PROJECT_MODEL});
+				if(this.newProject) {
+					response = await apiService.create({name: this.project.name , budget: this.project.budget} , {model:PROJECT_MODEL});
 				} else {
-					response = await apiService.update(this.update , this.project , {model:PROJECT_MODEL});
+					response = await apiService.update(this.project._id , { name: this.project.name , budget: this.project.budget } , {model:PROJECT_MODEL});
 				}
-				if(response.data) {
+
+                if(response.data && response.data.data) {
 					this.message = 'Project successfully created/updated!';
-                    if(this.supplierBudgets.length) {
+                    if(this.project.suppliers.length) {
                         await specificServiceEndPoints.addProjectBudgetsToSupplier(
                             response.data.data.id, 
-                            this.supplierBudgets.filter(item => item.supplier !== null)
+                            this.project.suppliers.map(item => {
+                                return {
+                                    supplier: this.allSuppliers[ this.allSuppliers.findIndex(supplier => item.name === supplier.name) ].id,
+                                    payments: item.payments,
+                                    budget: item.budget
+                                };
+                            })
                         );
                     }
-					this.showMessage = true;
-					this.update = 0;
-					setTimeout(() => {
-						this.dialog = false;
-						this.showMessage = false;
-					}, 2000);
 				}
+                this.showMessage = true;
+                setTimeout(() => {
+                    this.dialog = false;
+                    this.showMessage = false;
+                    this.resolve(true);
+                }, 2000);
+
 			} catch (error) {
 				console.log(error);
 			}
@@ -102,20 +109,32 @@ export default {
             try {
                 const suppliers = await apiService.get({model: SUPPLIER_MODEL});
                 this.currentSuppliers = suppliers.data.map(supplier => supplier.name);
+                this.allSuppliers = suppliers.data;
             } catch (error) {
                 console.log(error);
             }
         },
 		addBudgetField() {
-			this.supplierBudgets.push({ supplier: "" , budget: "" });
+			this.project.suppliers.push({ supplier: "" , budget: "" });
 		},
 		removeBudgetField(index) {
-			this.supplierBudgets.splice(index, 1)
+			this.project.suppliers.splice(index, 1);
 		},
-        open(project, update = 0) {
-            this.update = update;
-            this.project = project;
+        open(project, newProject) {
+            this.newProject = newProject;
+            this.project = newProject ? {name: '' , budget: '' , suppliers: []} : {
+                ...project,
+                suppliers: project.suppliers.map(item => {
+                    return {
+                        name: item.supplier.name,
+                        budget: item.budget,
+                        payments: item.payments
+                    }
+            })};
             this.dialog = true;
+            return new Promise((resolve) => {
+                this.resolve = resolve;
+            });
         },
     },
     mounted(){

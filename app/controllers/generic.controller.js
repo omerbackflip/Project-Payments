@@ -11,7 +11,7 @@ exports.create = async (req, res) => {
 			paymentService[req.query.middleware](db.suppliers,data);
 		}
 		if (data) {
-			res.send(data);
+			res.send({data , message: "Entity created successfully!"});
 		}
 	} catch (error) {
 		console.log(error);

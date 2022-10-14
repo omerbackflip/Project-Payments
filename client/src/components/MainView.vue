@@ -125,10 +125,6 @@ export default {
 	data() {
 		return {
 			projects: [],
-			project: {
-				budget: '',
-				name: '',
-			},
 			expanded: [],
 			paymentToUpdate: null,
 			selectedSupplier: {},
@@ -142,8 +138,8 @@ export default {
 				{ text: 'Controls', value: 'controls' },
 			],
 			supplierHeaders: [
-				{ text: 'Supplier Name', value: 'name' },
-				{ text: 'Supplier Budget for project', value: 'budgetForProject' },
+				{ text: 'Supplier Name', value: 'supplier.name' },
+				{ text: 'Supplier Budget for project', value: 'budget' },
 			],
 			paymentsHeaders: [
 				{ text: 'Project', value: 'project' },
@@ -170,12 +166,10 @@ export default {
 				console.log(error);
 			}
 		},
-		updateProject(item) {
-			if(item) {
-				this.project = {name: item.name , budget: item.budget};
-				this.update = item.id;
-			}
-			this.$refs.projectForm.open(this.project,this.update);
+		async updateProject(item) {
+			let newProject = item ? false : true;
+			await this.$refs.projectForm.open(item, newProject);
+			this.getProjects();
 		},
 		async deleteProject(id) {
 			try {
@@ -195,7 +189,6 @@ export default {
 		},
 		async deletePayment(id) {
             try {
-                console.log(id);
                 if (await this.$refs.confirm.open( "Confirm", "Are you sure you want to delete this item?")) {
                     await apiService.deleteOne({ model: PAYMENT_MODEL , id});
                     this.retrievePayments();

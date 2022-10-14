@@ -1,7 +1,8 @@
-exports.getProjectsAndProjectsToSave = (data) => {
+exports.getSuppliersAndPaymentsToSave = (data) => {
     try {
-        const uniqueProjects = [...new Set(data.map(item => item.project))];
-        const projects = uniqueProjects.map(item => {return {name: item}});
+        const uniqueSuppliers = [...new Set(data.map(item => item.supplier))];
+        const suppliers = uniqueSuppliers.map(item => {return {name: item}});
+
         let payments = [];
 
         data.forEach(item => {
@@ -21,7 +22,7 @@ exports.getProjectsAndProjectsToSave = (data) => {
             payments.push(payment);
         });
 
-        return { projects , payments };
+        return { suppliers , payments };
 
     } catch (error) {
         console.log(error)
@@ -29,21 +30,34 @@ exports.getProjectsAndProjectsToSave = (data) => {
     }
 }
 
-exports.getSuppliersToSave = (payments) => {
-    let suppliers = [];
+exports.getProjectsToSave = (suppliers,payments) => {
+    let projects = [] , projectIndex = -1 , supplierIndex = -1 , supplierId = 0;
+    
     if(payments && payments.length) {
-        payments.forEach(payment => {
-            if(suppliers.length) {
-                let index = suppliers.findIndex(i => i && payment.supplier === i.name);
-                if(index >= 0) {
-                    suppliers[index].payments.push(payment._id);
+        payments.map(async payment => {
+
+            supplierId = suppliers[suppliers.findIndex(supplier => supplier.name === payment.supplier)]._id;
+            projectIndex = projects.findIndex(project => project.name === payment.project);
+
+            if(projectIndex >= 0) {
+                supplierIndex = projects[projectIndex].suppliers.findIndex(supplier => String(supplier.supplier) === String(supplierId));
+                if(supplierIndex >= 0) {
+                    projects[projectIndex].suppliers[supplierIndex].payments.push(payment._id);
                     return;
-                }    
-            }
-            suppliers.push({name: payment.supplier , payments: [payment._id]});
+                }
+                projects[projectIndex].suppliers.push({payments: [payment._id] , supplier: supplierId });
+                return;
+            }    
+            projects.push({ 
+                name: payment.project,  
+                suppliers: [{
+                    payments: [payment._id], 
+                    supplier: supplierId
+                }], 
+            });
         });
     }
-    return suppliers;
+    return projects;
 }
 
 exports.addPaymentToSupplierMiddleWare = async (model, payment) => {
