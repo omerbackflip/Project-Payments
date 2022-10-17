@@ -28,7 +28,7 @@
 							<v-icon small>mdi-pencil</v-icon>
 						</v-btn>
                         <v-btn x-small>
-                            <v-icon small @click="deleteItem(item.id)">mdi-delete</v-icon>
+                            <v-icon small @click="deleteItem(item._id)">mdi-delete</v-icon>
                         </v-btn>
 					</template>
 
@@ -70,7 +70,7 @@
                     <v-btn @click="paymentToUpdate = item" x-small>
                         <v-icon small>mdi-pencil</v-icon>
                     </v-btn>
-                    <v-btn x-small @click="deleteItem(item.id)">
+                    <v-btn x-small @click="deleteItem(item._id)">
                       <v-icon small 
                         >mdi-delete</v-icon
                       >
@@ -147,9 +147,9 @@ export default {
                 const payments = await apiService.get({ model: PAYMENT_MODEL  , ...query });
 
                 this.payments = payments.data;
+                console.log(this.payments)
                 payments.data.forEach((num) => { this.total += (+num.amount) });
                 this.count = payments.data && payments.data.length;
-
                 this.$emit("getData", this.count, this.total, null);
                 this.$emit("total", this.total, "count", this.count);
 

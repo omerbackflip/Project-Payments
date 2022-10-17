@@ -83,10 +83,10 @@ export default {
 					this.message = 'Project successfully created/updated!';
                     if(this.project.suppliers.length) {
                         await specificServiceEndPoints.addProjectBudgetsToSupplier(
-                            response.data.data.id, 
+                            response.data.data._id, 
                             this.project.suppliers.map(item => {
                                 return {
-                                    supplier: this.allSuppliers[ this.allSuppliers.findIndex(supplier => item.name === supplier.name) ].id,
+                                    supplier: this.allSuppliers[ this.allSuppliers.findIndex(supplier => item.name === supplier.name) ]._id,
                                     payments: item.payments,
                                     budget: item.budget
                                 };

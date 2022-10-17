@@ -13,7 +13,7 @@ exports.getSuppliersAndPaymentsToSave = (data) => {
                 vat: item.vat,
                 paymentMethod: item.payMethod,
                 remark: item.remark,				
-                date: item.date,
+                date: new Date(item.date),
                 supplier: item.supplier,
                 clear: item.clear,
                 invoiceId: item.invoiceId,

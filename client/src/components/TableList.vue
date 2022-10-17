@@ -24,24 +24,24 @@
           loading-text="Loading... Please wait"
         >
           <template v-slot:[`item.actions`]="{ item }">
-            <!-- <v-icon small @click="editOne(item.id)">mdi-pencil</v-icon> -->
+            <!-- <v-icon small @click="editOne(item._id)">mdi-pencil</v-icon> -->
             <div>
               <v-icon
                 small
                 @click="
-                  itemToEdit === item.id ? updateOne(item) : setEdit(item)
+                  itemToEdit === item._id ? updateOne(item) : setEdit(item)
                 "
               >
-                {{ itemToEdit === item.id ? "mdi-floppy" : "mdi-pencil" }}
+                {{ itemToEdit === item._id ? "mdi-floppy" : "mdi-pencil" }}
               </v-icon>
-              <v-icon small @click="deleteOne(item.id)">mdi-delete</v-icon>
+              <v-icon small @click="deleteOne(item._id)">mdi-delete</v-icon>
             </div>
           </template>
           <template v-slot:[`item.description`]="{ item }">
-            <div v-if="itemToEdit === item.id">
+            <div v-if="itemToEdit === item._id">
               <v-text-field
                 v-model="item.description"
-                :id="`itemEdit-${item.id}`"
+                :id="`itemEdit-${item._id}`"
               />
             </div>
             <!-- <div v-else @click="setEdit(item)"> -->
@@ -50,10 +50,10 @@
             </div>
           </template>
           <template v-slot:[`item.table_id`]="{ item }">
-            <div v-if="itemToEdit === item.id">
+            <div v-if="itemToEdit === item._id">
               <v-text-field
                 v-model="item.table_id"
-                :id="`itemEdit-${item.id}`"
+                :id="`itemEdit-${item._id}`"
               />
               <!-- @blur="updateOne(item)"/> -->
             </div>
@@ -62,10 +62,10 @@
             </div>
           </template>
           <template v-slot:[`item.table_code`]="{ item }">
-            <div v-if="itemToEdit === item.id">
+            <div v-if="itemToEdit === item._id">
               <v-text-field
                 v-model="item.table_code"
-                :id="`itemEdit-${item.id}`"
+                :id="`itemEdit-${item._id}`"
               />
             </div>
             <div v-else @click="setEdit(item)">
@@ -89,24 +89,24 @@
           loading-text="Loading... Please wait"
         >
           <template v-slot:[`item.actions`]="{ item }">
-            <!-- <v-icon small @click="editOne(item.id)">mdi-pencil</v-icon> -->
+            <!-- <v-icon small @click="editOne(item._id)">mdi-pencil</v-icon> -->
             <div>
               <v-icon
                 small
                 @click="
-                  itemToEdit === item.id ? updateOne(item) : setEdit(item)
+                  itemToEdit === item._id ? updateOne(item) : setEdit(item)
                 "
               >
-                {{ itemToEdit === item.id ? "mdi-floppy" : "mdi-pencil" }}
+                {{ itemToEdit === item._id ? "mdi-floppy" : "mdi-pencil" }}
               </v-icon>
-              <v-icon small @click="deleteOne(item.id)">mdi-delete</v-icon>
+              <v-icon small @click="deleteOne(item._id)">mdi-delete</v-icon>
             </div>
           </template>
           <template v-slot:[`item.description`]="{ item }">
-            <div v-if="itemToEdit === item.id">
+            <div v-if="itemToEdit === item._id">
               <v-text-field
                 v-model="item.description"
-                :id="`itemEdit-${item.id}`"
+                :id="`itemEdit-${item._id}`"
               />
             </div>
             <!-- <div v-else @click="setEdit(item)"> -->
@@ -115,10 +115,10 @@
             </div>
           </template>
           <template v-slot:[`item.table_id`]="{ item }">
-            <div v-if="itemToEdit === item.id">
+            <div v-if="itemToEdit === item._id">
               <v-text-field
                 v-model="item.table_id"
-                :id="`itemEdit-${item.id}`"
+                :id="`itemEdit-${item._id}`"
               />
               <!-- @blur="updateOne(item)"/> -->
             </div>
@@ -127,10 +127,10 @@
             </div>
           </template>
           <template v-slot:[`item.table_code`]="{ item }">
-            <div v-if="itemToEdit === item.id">
+            <div v-if="itemToEdit === item._id">
               <v-text-field
                 v-model="item.table_code"
-                :id="`itemEdit-${item.id}`"
+                :id="`itemEdit-${item._id}`"
               />
             </div>
             <div v-else @click="setEdit(item)">
@@ -151,7 +151,7 @@
             <v-row>
               <v-col>
                 <v-text-field
-                  v-model="tblFields.id"
+                  v-model="tblFields._id"
                   label="ID"
                   :rules="fldRules"
                 ></v-text-field>
@@ -268,7 +268,7 @@ export default {
 
     updateOne(item) {
       apiService
-        .update(item.id, item, { model: TABLE_MODEL })
+        .update(item._id, item, { model: TABLE_MODEL })
         .then((response) => {
           console.log(response.data);
           this.message = "The updateOne() updated successfully!";
@@ -280,22 +280,22 @@ export default {
     },
 
     setEdit(item) {
-      this.itemToEdit = item.id;
+      this.itemToEdit = item._id;
       setTimeout(() => {
-        document.getElementById(`itemEdit-${item.id}`).focus();
+        document.getElementById(`itemEdit-${item._id}`).focus();
       }, 1);
     },
 
     addToTable() {
       var data = {
-        table_id: this.tblFields.id,
+        table_id: this.tblFields._id,
         table_code: this.tblFields.code,
         description: this.tblFields.description,
       };
       apiService
         .create(data, { model: TABLE_MODEL })
         .then((response) => {
-          this.tblFields.id = response.data.id;
+          this.tblFields._id = response.data._id;
           this.refreshList();
           this.clearForm();
         })

@@ -28,7 +28,7 @@
 						<v-btn @click="updateSupplier(item)" x-small>
 							<v-icon small>mdi-pencil</v-icon>
 						</v-btn>
-						<v-btn class="ml-1" @click="deleteSupplier(item.id)" x-small>
+						<v-btn class="ml-1" @click="deleteSupplier(item._id)" x-small>
 							<v-icon small>mdi-delete</v-icon>
 						</v-btn>
 					</template>
@@ -109,7 +109,7 @@ export default {
 		updateSupplier(item) {
 			this.supplier = {name: item.name , budget: item.budget};
 			this.dialog = true;
-			this.update = item.id;
+			this.update = item._id;
 		},
 		async deleteSupplier(id) {
 			try {

@@ -98,7 +98,7 @@
 						<v-btn @click="paymentToUpdate = item" x-small>
 							<v-icon small>mdi-pencil</v-icon>
 						</v-btn>
-                        <v-btn x-small @click="deletePayment(item.id)">
+                        <v-btn x-small @click="deletePayment(item._id)">
                             <v-icon small >mdi-delete</v-icon>
                         </v-btn>
 					</template>
@@ -142,16 +142,16 @@ export default {
 			showMessage: false,
 			message: '',
 			headers: [
-				{ text: 'Name', value: 'name' },
-				{ text: 'Budget', value: 'budget' },
-				{ text: 'Payed', value: 'total' },
+				{ text: 'Name', value: 'name', align:'end' },
+				{ text: 'Budget', value: 'budget', align:'end' },
+				{ text: 'Payed', value: 'total', align:'end' },
 				// { text: 'Date Created', value: 'createdAt' },
 				{ text: 'Controls', value: 'controls' },
 			],
 			supplierHeaders: [
 				{ text: 'Supplier', value: 'supplier.name' },
-				{ text: 'Budget', value: 'budget' },
-				{ text: 'Payed', value: 'total' },
+				{ text: 'Budget', value: 'budget', align:'end' },
+				{ text: 'Payed', value: 'total', align:'end' },
 			],
 			paymentsHeaders: [
 				// { text: 'Project', value: 'project' },
