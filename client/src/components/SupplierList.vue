@@ -98,7 +98,7 @@ export default {
 				if(response && response.data) {
 					this.suppliers = response.data.map(supplier => {
 						let totalBudget = 0;
-						supplier.budgets.forEach(item => { totalBudget+=item.budget });
+						// supplier.budgets.forEach(item => { totalBudget+=item.budget });
 						return { ...supplier , totalBudget };
 					});
 				}

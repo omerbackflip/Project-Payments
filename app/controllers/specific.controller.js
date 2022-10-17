@@ -7,6 +7,7 @@ const paymentService = require("../services/payment-service");
 const csv = require('csvtojson');
 const fs = require('fs');
 var mongoose = require('mongoose');
+const { suppliers } = require("../models");
 
 exports.savePaymentsBulk = async (req, res) => {
 
@@ -55,6 +56,18 @@ exports.getMainViewProjectData = async (req, res) => {
     try {
         let projects = await Project.find().populate('suppliers.supplier').populate('suppliers.payments').lean();
         if( projects && projects.length) {
+            for (i=0;i<projects.length;i++){
+                let projectSum = 0;
+                for (j=0;j<projects[i].suppliers.length;j++){
+                    let supplierSum = 0;
+                    for (k=0;k<projects[i].suppliers[j].payments.length;k++){
+                        supplierSum += projects[i].suppliers[j].payments[k].amount;
+                    }
+                    projects[i].suppliers[j].total = supplierSum;
+                    projectSum += supplierSum;
+                }
+                projects[i].total = projectSum;
+            }
             return res.send({success: true, projects});
         }
     } catch (error) {

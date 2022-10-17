@@ -12,6 +12,8 @@
 					:expanded.sync="expanded"
 					item-key="name"
 					show-expand
+					single-expand
+					mobile-breakpoint="0"
 				>
 					<template v-slot:top>
 						<v-toolbar flat>
@@ -23,8 +25,7 @@
 							</v-btn>
 						</v-toolbar>
 					</template>
-					<template v-slot:expanded-item="{item }">
-
+					<template v-slot:expanded-item="{item}">
 						<td :colspan="headers.length">
 							<v-data-table 
 								:headers="supplierHeaders"
@@ -33,18 +34,23 @@
 								disable-pagination
 								hide-default-footer
 								@click:row="onSupplierSelect"
+								mobile-breakpoint="0"
 								class="expanded-datatable">
 								<template v-slot:[`item.budget`]="{ item }">
-									<span>{{ item.budget || 0 }}</span>
+									<span>{{ item.budget.toLocaleString() || 0 }}</span>
+								</template>
+								<template v-slot:[`item.total`]="{ item }">
+									{{item.total.toLocaleString()}}
 								</template>
 							</v-data-table>
 						</td>
-
+					</template>
+					<template v-slot:[`item.total`]="{ item }">
+						{{item.total.toLocaleString()}}
 					</template>
 					<template v-slot:[`item.createdAt`]="{ item }">
 						<span>{{ new Date(item.createdAt).toLocaleString() }}</span>
 					</template>
-
 					<template v-slot:[`item.controls`]="{ item }">
 						<v-btn @click="updateProject(item)" x-small>
 							<v-icon small>mdi-pencil</v-icon>
@@ -53,13 +59,11 @@
 							<v-icon small>mdi-delete</v-icon>
 						</v-btn>
 					</template>
-
 				</v-data-table>
 			</v-card>
 		</v-layout>
 
 		<!-- View payments of supplier -->
-
 		<v-dialog
 			v-model="supplierPaymentsDialog"
 			class="payments-dialog"
@@ -70,19 +74,26 @@
 				disable-pagination
 				hide-default-footer
 				fixed-header
+					height="75vh"
 				:items="selectedSupplier.payments"
+				mobile-breakpoint="0"
 				>
-
 					<template v-slot:top>
 						<v-toolbar flat>
-							<v-toolbar-title>All Payments</v-toolbar-title>
+							<v-toolbar-title>תשלומים 
+									{{selectedSupplier.payments[0].project}} - 
+									{{selectedSupplier.supplier.name}} -
+									{{selectedSupplier.total.toLocaleString()}}
+							</v-toolbar-title>
 							<v-spacer></v-spacer>
 						</v-toolbar>
 					</template>
 					<template v-slot:[`item.date`]="{ item }">
-						<span>{{ new Date(item.date).toDateString() }}</span>
+						<span>{{ new Date(item.date).toLocaleDateString('he-EG') }}</span>
 					</template>
-
+					<template v-slot:[`item.amount`]="{ item }">
+						{{item.amount.toLocaleString()}}
+					</template>
 					<template v-slot:[`item.controls`]="{ item }">
 						<v-btn @click="paymentToUpdate = item" x-small>
 							<v-icon small>mdi-pencil</v-icon>
@@ -91,7 +102,6 @@
                             <v-icon small >mdi-delete</v-icon>
                         </v-btn>
 					</template>
-
             </v-data-table>
 			</v-card>
 		</v-dialog>
@@ -134,23 +144,25 @@ export default {
 			headers: [
 				{ text: 'Name', value: 'name' },
 				{ text: 'Budget', value: 'budget' },
-				{ text: 'Date Created', value: 'createdAt' },
+				{ text: 'Payed', value: 'total' },
+				// { text: 'Date Created', value: 'createdAt' },
 				{ text: 'Controls', value: 'controls' },
 			],
 			supplierHeaders: [
-				{ text: 'Supplier Name', value: 'supplier.name' },
-				{ text: 'Supplier Budget for project', value: 'budget' },
+				{ text: 'Supplier', value: 'supplier.name' },
+				{ text: 'Budget', value: 'budget' },
+				{ text: 'Payed', value: 'total' },
 			],
 			paymentsHeaders: [
-				{ text: 'Project', value: 'project' },
-				{ text: 'Amount', value: 'amount' },
-				{ text: 'Vat', value: 'vat' },
-				{ text: 'Payment Method', value: 'paymentMethod' },
-				{ text: 'Remarks', value: 'remark' },
-				{ text: 'Supplier', value: 'supplier' },
-				{ text: 'Invoice ID', value: 'invoiceId' },
+				// { text: 'Project', value: 'project' },
+				// { text: 'Vat', value: 'vat' },
+				// { text: 'Payment Method', value: 'paymentMethod' },
 				{ text: 'Date', value: 'date' },
+				{ text: 'Amount', value: 'amount', align:'end'},
+				{ text: 'Remarks', value: 'remark', align:'end' },
 				{ text: 'Controls', value: 'controls' },
+				// { text: 'Supplier', value: 'supplier' },
+				// { text: 'Invoice ID', value: 'invoiceId' },
 			]
 		}
 	},
@@ -166,11 +178,13 @@ export default {
 				console.log(error);
 			}
 		},
+
 		async updateProject(item) {
 			let newProject = item ? false : true;
 			await this.$refs.projectForm.open(item, newProject);
 			this.getProjects();
 		},
+
 		async deleteProject(id) {
 			try {
 				if(id) {
@@ -183,10 +197,12 @@ export default {
 				console.log(error);		
 			}
 		},
+
 		onSupplierSelect(supplier) {
 			this.selectedSupplier = supplier;
 			this.supplierPaymentsDialog = true;
 		},
+
 		async deletePayment(id) {
             try {
                 if (await this.$refs.confirm.open( "Confirm", "Are you sure you want to delete this item?")) {
@@ -197,10 +213,12 @@ export default {
                 console.log(error);
             }
         },
+
 		onPaymentFormClose() {
             this.paymentToUpdate = null;
         }
 	},
+
 	mounted() {
 		this.getProjects();
 	},

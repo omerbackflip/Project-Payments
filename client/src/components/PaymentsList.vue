@@ -20,7 +20,7 @@
 						</v-toolbar>
 					</template>
 					<template v-slot:[`item.date`]="{ item }">
-						<span>{{ new Date(item.date).toDateString() }}</span>
+						<span>{{ new Date(item.date).toLocaleDateString('he-EG') }}</span>
 					</template>
 
 					<template v-slot:[`item.controls`]="{ item }">
