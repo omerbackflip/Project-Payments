@@ -17,7 +17,7 @@
                             <v-text-field v-model="payment.total" label="total"></v-text-field>
                         </v-col>          
                         <v-col cols="4">
-                            <v-dialog ref="dateModal" v-model="dateModal" :return-value.sync="payment.date" persistent width="290px">
+                            <v-dialog ref="dialog" v-model="dateModal" :return-value.sync="payment.date" persistent width="290px">
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field 
                                     v-model="payment.date"
@@ -77,7 +77,7 @@
 
 <script>
 import { PAYMENT_MODEL, PROJECT_MODEL, SUPPLIER_MODEL } from '../constants/constants';
-import moment from 'moment';
+// import moment from 'moment';
 import apiService from "../services/apiService";
 export default {
     name: "payment",
@@ -132,8 +132,8 @@ export default {
     mounted() {
         this.getAllProjectsAndSuppliers();
 		this.payment = this.paymentToUpdate ?  this.paymentToUpdate : {};
-        this.payment.date = moment(this.payment.date).toDate();
-        console.log(this.payment)
+        this.payment.date = (new Date(this.payment.date)).toISOString().substr(0, 10);
+        // console.log(new Date(this.payment.date).toDateString())
         this.dialog = true;
 	},
      watch:{
