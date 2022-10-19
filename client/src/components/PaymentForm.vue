@@ -54,7 +54,7 @@
                             ></v-select>
                         </v-col>
                         <v-col cols="4">
-                            <v-text-field v-model="payment.payMethod" label="credit"></v-text-field>
+                            <v-text-field v-model="payment.paymentMethod" label="credit"></v-text-field>
                         </v-col>
                         <v-col cols="4">
                             <v-text-field v-model="payment.clear" label="clearance"></v-text-field>
@@ -90,7 +90,7 @@ export default {
           amount:       null,
           vat:          null,
           total:        null,
-          payMethod:    "",
+          paymentMethod:    "",
           date:         null,
           supplier:     "",
           invoiceId:    "",
@@ -109,6 +109,7 @@ export default {
                     apiService.update(this.payment._id, this.payment, {model: PAYMENT_MODEL });
                 } else {
                     apiService.create(this.payment , {model: PAYMENT_MODEL , middleware: 'addPaymentToSupplierMiddleWare'});
+                    console.log(this.payment)
                 }
             this.dialog = false;   
             } catch (error) {
@@ -132,7 +133,7 @@ export default {
     mounted() {
         this.getAllProjectsAndSuppliers();
 		this.payment = this.paymentToUpdate ?  this.paymentToUpdate : {};
-        this.payment.date = (new Date(this.payment.date)).toISOString().substr(0, 10);
+        this.payment.date = this.paymentToUpdate ? (new Date(this.payment.date)).toISOString().substr(0, 10) : '';
         // console.log(new Date(this.payment.date).toDateString())
         this.dialog = true;
 	},

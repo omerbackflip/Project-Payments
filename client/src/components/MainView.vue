@@ -174,6 +174,7 @@ export default {
 				if(response.data && response.data.success) {
 					this.projects = response.data.projects;
 				}
+				console.log(this.projects)
 			} catch (error) {
 				console.log(error);
 			}

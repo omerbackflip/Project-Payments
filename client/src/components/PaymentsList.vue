@@ -3,7 +3,7 @@
     <v-layout row wrap>
 
 
-      <!-- Web-view -->
+      <!-- Web-view 
         <div v-show="!isMobile() && !noData">
             <v-data-table
                 :headers="headers"
@@ -35,13 +35,13 @@
             </v-data-table>
         </div>
 
-      <!-- End-Web-view -->
+       End-Web-view -->
 
 
 
       <!-- Mobile-view -->
-
-      <v-flex v-show="isMobile()">
+      <!-- <v-flex v-show="isMobile()"> -->
+      <v-flex>
         <v-list  v-show="!noData" two-line dense rounded>
           <v-list-item-group v-model="selected" active-class="pink--text">
             <template v-for="(item, index) in payments">
@@ -52,12 +52,12 @@
                       {{ item.supplier }}
                     </v-list-item-title>
                     <v-list-item-subtitle class="blue--text">
-                      {{ item.amount ? item.amount.toLocaleString() : "" }} -
-                      {{ item.date }}
+                      {{ item.amount ? item.amount.toLocaleString() : "" }}
+                      {{ "("+ new Date(item.date).toLocaleDateString('he-EG') +")" }}
                     </v-list-item-subtitle>
                     <v-list-item-subtitle>
-                      {{ item.invoiceId ? "Inv: " + item.invoiceId : "" }} -
-                      {{ item.payMethod ? "Chequ:" + item.payMethod : "" }}
+                      {{ item.invoiceId ? "Inv: " + item.invoiceId : "" }}
+                      {{ item.paymentMethod ? "(" + item.paymentMethod + ")" : "" }}
                     </v-list-item-subtitle>
                     <v-list-item-subtitle class="right">
                       {{ item.remark ? item.remark : "" }}
@@ -147,7 +147,6 @@ export default {
                 const payments = await apiService.get({ model: PAYMENT_MODEL  , ...query });
 
                 this.payments = payments.data;
-                console.log(this.payments)
                 payments.data.forEach((num) => { this.total += (+num.amount) });
                 this.count = payments.data && payments.data.length;
                 this.$emit("getData", this.count, this.total, null);
@@ -162,14 +161,12 @@ export default {
                 const response = await apiService.get({ model: SUPPLIER_MODEL});
                 this.suppliersList = response.data.map(supplier => supplier.name);
                 this.$emit("getData", null, null, this.suppliersList);
-
             } catch (error) {
                 console.log(error);
             }
         },
         async deleteItem(id) {
             try {
-                console.log(id);
                 if (await this.$refs.confirm.open( "Confirm", "Are you sure you want to delete this item?")) {
                     await apiService.deleteOne({ model: PAYMENT_MODEL , id});
                     this.retrievePayments();
@@ -200,6 +197,7 @@ export default {
         this.$root.$on("onSupplierChange", (supplier) => {
             this.selectedSupplier = supplier;
         });
+        console.log('PaymentList.vue')
     },
 
     watch: {
