@@ -61,11 +61,20 @@ exports.getProjectsToSave = (suppliers,payments) => {
 }
 
 exports.addPaymentToSupplierMiddleWare = async (model, payment) => {
-    console.log(payment)
     if(payment && payment._id) {
-        // await model.updateOne({name: payment.supplier} , 
-        await model.updateOne({name: payment.project, suppliers: payment.supplier} , 
-            { $push: { "payment.suppliers.payments": payment._id } },            
-        );
+        const supplier = await model.suppliers.findOne({name: payment.supplier});
+
+        if(await model.projects.exists({name: payment.project, 'suppliers.supplier': supplier._id})) {
+
+            const project = await model.projects.findOne({name: payment.project});
+            const index = project.suppliers.findIndex(item => String(item.supplier) === String(supplier._id));
+            project.suppliers[index].payments.push(payment._id);
+            await model.projects.updateOne({name: project.name}, project);
+
+        } else {
+            await model.projects.updateOne({name: payment.project}, 
+                { $push: { "suppliers": { payments : [payment._id] , supplier: supplier._id } } },
+            )
+        }
     }
 }

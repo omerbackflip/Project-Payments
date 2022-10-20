@@ -109,9 +109,9 @@ export default {
                     apiService.update(this.payment._id, this.payment, {model: PAYMENT_MODEL });
                 } else {
                     apiService.create(this.payment , {model: PAYMENT_MODEL , middleware: 'addPaymentToSupplierMiddleWare'});
-                    console.log(this.payment)
                 }
-            this.dialog = false;   
+                window.location.reload();
+                this.dialog = false;   
             } catch (error) {
                 console.log(error);
             }

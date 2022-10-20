@@ -8,7 +8,7 @@ exports.create = async (req, res) => {
 		const entity = { ...req.body };
 		const data = await dbService.createItem(db[req.query.model], entity);
 		if(req.query.middleware) {
-			paymentService[req.query.middleware](db.suppliers,data);
+			paymentService[req.query.middleware](db,data);
 		}
 		if (data) {
 			res.send({data , message: "Entity created successfully!"});
