@@ -28,7 +28,7 @@ export default new Router({
     },
     {
       path: "/table-list",
-      name: "tableList",
+      name: "table-list",
       component: () => import("./components/TableList")
     },
   ]

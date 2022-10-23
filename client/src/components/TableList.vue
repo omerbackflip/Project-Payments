@@ -22,6 +22,7 @@
           class="elevation-3"
           loading="isLoading"
           loading-text="Loading... Please wait"
+					mobile-breakpoint="0"
         >
           <template v-slot:[`item.actions`]="{ item }">
             <!-- <v-icon small @click="editOne(item._id)">mdi-pencil</v-icon> -->
@@ -87,6 +88,7 @@
           class="elevation-3"
           loading="isLoading"
           loading-text="Loading... Please wait"
+					mobile-breakpoint="0"
         >
           <template v-slot:[`item.actions`]="{ item }">
             <!-- <v-icon small @click="editOne(item._id)">mdi-pencil</v-icon> -->
@@ -246,6 +248,7 @@ export default {
         .then((response) => {
           this.tables = response.data;
           this.tableID = response.data.filter((item) => item.table_id === 99);
+          console.log(response)
         })
         .catch((e) => {
           console.log(e);

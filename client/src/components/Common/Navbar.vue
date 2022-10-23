@@ -73,7 +73,7 @@ export default {
                 {icon: 'mdi-arrow-up-bold-box-outline', text: 'Import payments', route: null , onClick: this.toggleModal},
                 {icon: 'mdi-briefcase-check', text: 'Project list', route: '/project-list'},
                 {icon: 'mdi-account-multiple-check', text: 'Supplier list', route: '/supplier-list'},
-                {icon: 'mdi-file-table-box-multiple', text: 'Table list', route: '/tableList'},
+                {icon: 'mdi-file-table-box-multiple', text: 'Table list', route: '/table-list'},
             ],
             supplierList : ['All'],
             selectedSupplier : "All",

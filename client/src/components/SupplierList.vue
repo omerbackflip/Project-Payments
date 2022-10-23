@@ -9,6 +9,11 @@
 					fixed-header
 					height="75vh"
 					:items="suppliers"
+					mobile-breakpoint="0"
+					:expanded.sync="expanded"
+					item-key="name"
+					show-expand
+					single-expand
 				>
 					<template v-slot:top>
 						<v-toolbar flat>
@@ -20,9 +25,21 @@
 							</v-btn>
 						</v-toolbar>
 					</template>
-					<template v-slot:[`item.createdAt`]="{ item }">
-						<span>{{ new Date(item.createdAt).toLocaleString() }}</span>
+
+					<template v-slot:expanded-item="{item}">
+						<td :colspan="headers.length">
+							<v-data-table 
+								:headers="projectHeaders"
+								:items="item.projects"
+								dense
+								disable-pagination
+								hide-default-footer
+								mobile-breakpoint="0"
+								class="expanded-datatable">
+							</v-data-table>
+						</td>
 					</template>
+
 
 					<template v-slot:[`item.controls`]="{ item }">
 						<v-btn @click="updateSupplier(item)" x-small>
@@ -32,7 +49,6 @@
 							<v-icon small>mdi-delete</v-icon>
 						</v-btn>
 					</template>
-
 				</v-data-table>
 			</v-card>
 		</v-layout>
@@ -66,6 +82,7 @@
 <script>
 import { SUPPLIER_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
+import specificServiceEndPoints from '../services/specificServiceEndPoints';
 import ConfirmDialog from './Common/ConfirmDialog.vue';
 
 export default {
@@ -85,22 +102,25 @@ export default {
 			headers: [
 				{ text: 'Name', value: 'name' },
 				{ text: 'Budget', value: 'totalBudget' },
-				{ text: 'Date Created', value: 'createdAt' },
+				// { text: 'Date Created', value: 'createdAt' },
 				{ text: 'Controls', value: 'controls' },
 			],
+			projectHeaders: [
+				{ text: 'Project', value: 'name'},
+				{ text: 'Budget', value: 'budget', align:'end' },
+				{ text: 'Payed', value: 'payed', align:'end' },
+			],
+			expanded: [],
 		}
 	},
 
 	methods: {
 		async getSuppliers() {
 			try {
-				const response = await apiService.get({model: SUPPLIER_MODEL});
+				const response = await specificServiceEndPoints.retrieveAllSuppliersData();
 				if(response && response.data) {
-					this.suppliers = response.data.map(supplier => {
-						let totalBudget = 0;
-						// supplier.budgets.forEach(item => { totalBudget+=item.budget });
-						return { ...supplier , totalBudget };
-					});
+					this.suppliers = response.data.suppliers
+					console.log(this.suppliers)
 				}
 			} catch (error) {
 				console.log(error);
@@ -157,4 +177,11 @@ export default {
 .field-margin{
 	margin: 12px;
 }
+.expanded-datatable{
+	width: 90%;
+    margin: 12px;
+    border: 10px solid #98e983;
+	cursor: pointer;
+}
+
 </style>

@@ -21,6 +21,10 @@ class SpecificServiceEndPoints {
 		return await http.get(`${baseUrl}/specific/main-view-project-data`);
 	}
 
+	async retrieveAllSuppliersData() {
+		return await http.get(`${baseUrl}/specific/main-view-supplier-data`);
+	}
+
 	async addProjectBudgetsToSupplier(projectId,supplierBudgets) {
 		return await http.put(`${baseUrl}/specific/add-supplier-budgets/${projectId}`, supplierBudgets);
 	}

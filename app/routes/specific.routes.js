@@ -13,6 +13,7 @@ module.exports = app => {
   router.put("/delete-project/:projectId" , specific.deleteProjectAndData);
   router.get("/main-view-project-data" , specific.getMainViewProjectData);
   router.put("/add-supplier-budgets/:projectId" , specific.addSupplierBudgetsToProject);
+  router.get("/main-view-supplier-data" , specific.getMainViewSupplierData);
   
   app.use('/api/specific', router);
 };
