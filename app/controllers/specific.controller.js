@@ -79,39 +79,18 @@ exports.getMainViewProjectData = async (req, res) => {
 exports.getMainViewSupplierData = async (req, res) => {
     try {
         let suppliers = await Supplier.find().lean();
-        if( suppliers && suppliers.length) {
-            let payments = await Payment.find().lean();
-            //loop for each supplier and map related payments
-            for (i=0 ; i < suppliers.length ; i++){
-                let allSupplierPayments = payments.filter((item) => {  
-                    return (item.supplier === suppliers[i].name)
-                })
-                // build list of project to each supplier
-                const listOfProjects = [];
-                allSupplierPayments.map(x => listOfProjects.filter(a => a.project == x.project).length > 0 
-                    ? null 
-                    : listOfProjects.push(x)
-                );
-
-                let listOfPaymentsForProject = [];
-                // console.log(suppliers[i].name + " - " + listOfProjects.length + " PROJECTS")
-
-                for (j=0 ; j < listOfProjects.length ; j++){
-                    // console.log(allSupplierPayments[j].project + " - " + listOfProjects[j].project)
-                    listOfPaymentsForProject = allSupplierPayments.filter((item) => {
-                        return (item.project === listOfProjects[j].project)
-                    })
-
-                    listOfProjects[j].payments = "listOfPaymentsForProject";
-                    // console.log("=========" + listOfProjects[j].project)
+        if(suppliers && suppliers.length) {
+            await Promise.all(suppliers.map(async supplier => {
+                supplier.projects = await Project.find({"suppliers.supplier" : supplier._id}, 'name budget').lean();
+                if(supplier.projects && supplier.projects.length) {
+                    await Promise.all(supplier.projects.map(async project=> {
+                        project.payments = await Payment.find({supplier: supplier.name , project: project.name}).lean();
+                    }));
                 }
-
-                suppliers[i].projects = listOfProjects.map((item) => {
-                    return ({"name":item.project , "payed":555, "payments":item.payments})
-                })
-            }
-            return res.send({success: true, suppliers});
+            }))
         }
+        return res.send({success: true, suppliers});
+
     } catch (error) {
         console.log(error)
 		res.status(500).send({ message: "Error getting main view supplier data", error });

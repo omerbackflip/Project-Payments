@@ -31,6 +31,7 @@
 							<v-data-table 
 								:headers="projectHeaders"
 								:items="item.projects"
+								@click:row="onProjectSelect"
 								dense
 								disable-pagination
 								hide-default-footer
@@ -74,20 +75,70 @@
 			</v-card>
 		</v-dialog>
 		<confirm-dialog ref="confirm"/>
+
+			<!-- View payments of supplier -->
+		<v-dialog
+			v-model="projectPaymentsDialog"
+			class="payments-dialog"
+		>
+			<v-card>
+				<v-data-table
+				:headers="paymentsHeaders"
+				disable-pagination
+				hide-default-footer
+				fixed-header
+					height="75vh"
+				:items="selectedProject.payments"
+				mobile-breakpoint="0"
+				>
+					<template v-slot:top>
+						<v-toolbar flat>
+							<v-toolbar-title>תשלומים </v-toolbar-title>
+							<v-spacer></v-spacer>
+						</v-toolbar>
+					</template>
+					<template v-slot:[`item.date`]="{ item }">
+						<span>{{ new Date(item.date).toLocaleDateString('he-EG') }}</span>
+					</template>
+					<template v-slot:[`item.amount`]="{ item }">
+						{{item.amount.toLocaleString()}}
+					</template>
+					<template v-slot:[`item.controls`]="{ item }">
+						<v-btn @click="paymentToUpdate = item" x-small>
+							<v-icon small>mdi-pencil</v-icon>
+						</v-btn>
+                        <v-btn x-small @click="deletePayment(item._id)">
+                            <v-icon small >mdi-delete</v-icon>
+                        </v-btn>
+					</template>
+            </v-data-table>
+			</v-card>
+		</v-dialog>
+				<!-- -------------------- -->
+		<template v-if="paymentToUpdate">
+			<Payment 
+				:onPaymentFormClose="onPaymentFormClose" 
+				title="Update Payment" 
+				:paymentToUpdate="paymentToUpdate" 
+			/>
+		</template>
 	</div>
+
+	
 </template>
 
 
 
 <script>
-import { SUPPLIER_MODEL } from "../constants/constants";
+import { PAYMENT_MODEL, SUPPLIER_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
 import ConfirmDialog from './Common/ConfirmDialog.vue';
+import Payment from "./PaymentForm.vue";
 
 export default {
 	name: "supplier-list",
-	components: { ConfirmDialog },
+	components: { ConfirmDialog,Payment },
 	data() {
 		return {
 			suppliers: [],
@@ -96,7 +147,10 @@ export default {
 				name: '',
 			},
 			update: 0,
+			paymentToUpdate: null,
 			dialog: false,
+			projectPaymentsDialog: false,
+			selectedProject: {},
 			showMessage: false,
 			message: '',
 			headers: [
@@ -109,6 +163,17 @@ export default {
 				{ text: 'Project', value: 'name'},
 				{ text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Payed', value: 'payed', align:'end' },
+			],
+			paymentsHeaders: [
+				// { text: 'Project', value: 'project' },
+				// { text: 'Vat', value: 'vat' },
+				// { text: 'Payment Method', value: 'paymentMethod' },
+				{ text: 'Date', value: 'date' },
+				{ text: 'Amount', value: 'amount', align:'end'},
+				{ text: 'Remarks', value: 'remark', align:'end' },
+				{ text: 'Controls', value: 'controls' },
+				// { text: 'Supplier', value: 'supplier' },
+				// { text: 'Invoice ID', value: 'invoiceId' },
 			],
 			expanded: [],
 		}
@@ -125,6 +190,20 @@ export default {
 			} catch (error) {
 				console.log(error);
 			}
+		},
+		async deletePayment(id) {
+            try {
+                if (await this.$refs.confirm.open( "Confirm", "Are you sure you want to delete this item?")) {
+                    await apiService.deleteOne({ model: PAYMENT_MODEL , id});
+                    this.getSuppliers();
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        },
+		onProjectSelect(project) {
+			this.selectedProject = project;
+			this.projectPaymentsDialog = true;
 		},
 		updateSupplier(item) {
 			this.supplier = {name: item.name , budget: item.budget};
@@ -143,6 +222,9 @@ export default {
 				console.log(error);		
 			}
 		},
+		onPaymentFormClose() {
+            this.paymentToUpdate = null;
+        },
 		async submitSupplier() {
 			try {
 				let response;
