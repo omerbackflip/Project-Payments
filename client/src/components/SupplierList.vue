@@ -160,7 +160,7 @@ export default {
 				{ text: 'Controls', value: 'controls' },
 			],
 			projectHeaders: [
-				{ text: 'Project', value: 'name'},
+				{ text: 'Project', value: 'project'},
 				{ text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Payed', value: 'payed', align:'end' },
 			],

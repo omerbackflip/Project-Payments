@@ -81,10 +81,13 @@ exports.getMainViewSupplierData = async (req, res) => {
         let suppliers = await Supplier.find().lean();
         if(suppliers && suppliers.length) {
             await Promise.all(suppliers.map(async supplier => {
-                supplier.projects = await Project.find({"suppliers.supplier" : supplier._id}, 'name budget').lean();
+                supplier.projects = await Payment.find({"supplier" : supplier.name}, 'project').lean();
+                supplier.projects = supplier.projects.filter((value, index, self) =>
+                    index === self.findIndex((t) => ( t.project === value.project))
+                )
                 if(supplier.projects && supplier.projects.length) {
                     await Promise.all(supplier.projects.map(async project=> {
-                        project.payments = await Payment.find({supplier: supplier.name , project: project.name}).lean();
+                        project.payments = await Payment.find({supplier: supplier.name , project: project.project}).lean();
                     }));
                 }
             }))
