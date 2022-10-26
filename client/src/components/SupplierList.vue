@@ -25,7 +25,6 @@
 							</v-btn>
 						</v-toolbar>
 					</template>
-
 					<template v-slot:expanded-item="{item}">
 						<td :colspan="headers.length">
 							<v-data-table 
@@ -37,11 +36,12 @@
 								hide-default-footer
 								mobile-breakpoint="0"
 								class="expanded-datatable">
+								<template v-slot:[`item.payed`]="{ item }">
+									<span>{{ item.payed.toLocaleString()  }} </span>
+								</template>
 							</v-data-table>
 						</td>
-					</template>
-
-
+					</template>	
 					<template v-slot:[`item.controls`]="{ item }">
 						<v-btn @click="updateSupplier(item)" x-small>
 							<v-icon small>mdi-pencil</v-icon>
@@ -185,7 +185,6 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllSuppliersData();
 				if(response && response.data) {
 					this.suppliers = response.data.suppliers
-					console.log(this.suppliers)
 				}
 			} catch (error) {
 				console.log(error);

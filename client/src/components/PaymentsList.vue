@@ -197,7 +197,6 @@ export default {
         this.$root.$on("onSupplierChange", (supplier) => {
             this.selectedSupplier = supplier;
         });
-        console.log('PaymentList.vue')
     },
 
     watch: {

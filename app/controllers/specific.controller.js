@@ -88,6 +88,9 @@ exports.getMainViewSupplierData = async (req, res) => {
                 if(supplier.projects && supplier.projects.length) {
                     await Promise.all(supplier.projects.map(async project=> {
                         project.payments = await Payment.find({supplier: supplier.name , project: project.project}).lean();
+                        project.payed = project.payments.reduce((payed, item) => {
+                            return item.amount + payed
+                        }, 0) 
                     }));
                 }
             }))

@@ -9,6 +9,7 @@
 					fixed-header
 					height="75vh"
 					:items="projects"
+					mobile-breakpoint="0"
 				>
 					<template v-slot:top>
 						<v-toolbar flat>
@@ -20,8 +21,8 @@
 							</v-btn>
 						</v-toolbar>
 					</template>
-					<template v-slot:[`item.createdAt`]="{ item }">
-						<span>{{ new Date(item.createdAt).toLocaleString() }}</span>
+					<template v-slot:[`item.total`]="{ item }">
+						<span>{{ item.total.toLocaleString() }}</span>
 					</template>
 
 					<template v-slot:[`item.controls`]="{ item }">
@@ -59,7 +60,7 @@ export default {
 			headers: [
 				{ text: 'Name', value: 'name' },
 				{ text: 'Budget', value: 'budget' },
-				{ text: 'Date Created', value: 'createdAt' },
+				{ text: 'Payed', value: 'total', align: 'right' },
 				{ text: 'Controls', value: 'controls' },
 			],
 		}
