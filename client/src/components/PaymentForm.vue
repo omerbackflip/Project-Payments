@@ -2,7 +2,7 @@
     <v-dialog v-model="dialog" max-width="600px">
         <v-card>
             <v-card-title>
-                <h2>{{title}}</h2>
+                <h2>{{title}} {{!paymentToUpdate ? ' - New Payment' : ''}}</h2>
             </v-card-title>
             <v-card-text>
                 <v-container>
@@ -70,6 +70,7 @@
                 <v-spacer></v-spacer>
                 <v-btn color="primary" @click="dialog=false">close</v-btn>
                 <v-btn color="primary" @click="savePayment()">Save</v-btn>
+                <v-btn color="primary" @click="copyPayment()" v-show="paymentToUpdate">Copy</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -100,6 +101,7 @@ export default {
         dialog: false,
         currentSuppliers: [],
         dateModal : false,
+        disabled: false,
       }
     },
     methods: {
@@ -127,6 +129,11 @@ export default {
             } catch (error) {
                 console.log(error);
             }
+        },
+        copyPayment(){
+            this.paymentToUpdate = null;
+            delete this.payment._id ;
+            this.disabled = true
         }
     },
 
@@ -134,7 +141,6 @@ export default {
         this.getAllProjectsAndSuppliers();
 		this.payment = this.paymentToUpdate ?  this.paymentToUpdate : {};
         this.payment.date = this.paymentToUpdate ? (new Date(this.payment.date)).toISOString().substr(0, 10) : '';
-        // console.log(new Date(this.payment.date).toDateString())
         this.dialog = true;
 	},
      watch:{

@@ -207,7 +207,7 @@ export default {
             try {
                 if (await this.$refs.confirm.open( "Confirm", "Are you sure you want to delete this item?")) {
                     await apiService.deleteOne({ model: PAYMENT_MODEL , id});
-                    this.retrievePayments();
+					window.location.reload();
                 }
             } catch (error) {
                 console.log(error);
