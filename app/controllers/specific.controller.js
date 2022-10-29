@@ -54,22 +54,39 @@ exports.deleteProjectAndData = async (req, res) => {
 
 exports.getMainViewProjectData = async (req, res) => {
     try {
-        let projects = await Project.find().populate('suppliers.supplier').populate('suppliers.payments').lean();
+        // let projects = await Project.find().populate('suppliers.supplier').populate('suppliers.payments').lean();
+        let projects = await Project.find().lean();
         if( projects && projects.length) {
-            for (i=0;i<projects.length;i++){
-                let projectSum = 0;
-                for (j=0;j<projects[i].suppliers.length;j++){
-                    let supplierSum = 0;
-                    for (k=0;k<projects[i].suppliers[j].payments.length;k++){
-                        supplierSum += projects[i].suppliers[j].payments[k].amount;
+            // for (i=0;i<projects.length;i++){
+            //     let projectSum = 0;
+            //     for (j=0;j<projects[i].suppliers.length;j++){
+            //         let supplierSum = 0;
+            //         for (k=0;k<projects[i].suppliers[j].payments.length;k++){
+            //             supplierSum += projects[i].suppliers[j].payments[k].amount;
+            //         }
+            //         projects[i].suppliers[j].total = supplierSum;
+            //         projectSum += supplierSum;
+            //     }
+            //     projects[i].total = projectSum;
+            // }
+            if(projects && projects.length) {
+                await Promise.all(projects.map(async project => {
+                    project.suppliers = await Payment.find({"project" : project.name}, 'supplier').lean();
+                    project.suppliers = project.suppliers.filter((value, index, self) =>
+                        index === self.findIndex((t) => ( t.supplier === value.supplier))
+                    )
+                    if(project.suppliers && project.suppliers.length) {
+                        await Promise.all(project.suppliers.map(async supplier=> {
+                            supplier.payments = await Payment.find({supplier: supplier.supplier , project: project.name}).lean();
+                            supplier.payed = supplier.payments.reduce((payed, item) => {
+                                return item.amount + payed
+                            }, 0) 
+                        }));
                     }
-                    projects[i].suppliers[j].total = supplierSum;
-                    projectSum += supplierSum;
-                }
-                projects[i].total = projectSum;
-            }
+                }))
+            } 
             return res.send({success: true, projects});
-        }
+        }       
     } catch (error) {
         console.log(error)
 		res.status(500).send({ message: "Error getting main view project data", error });

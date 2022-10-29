@@ -93,7 +93,11 @@
 				>
 					<template v-slot:top>
 						<v-toolbar flat>
-							<v-toolbar-title>תשלומים </v-toolbar-title>
+							<v-toolbar-title>תשלומים
+								{{selectedProject.payments[0].project}} - 
+								{{selectedProject.payments[0].supplier}} -
+								<!-- {{selectedSupplier.total.toLocaleString()}} -->
+							</v-toolbar-title>
 							<v-spacer></v-spacer>
 						</v-toolbar>
 					</template>

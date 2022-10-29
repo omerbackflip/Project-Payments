@@ -36,17 +36,14 @@
 								@click:row="onSupplierSelect"
 								mobile-breakpoint="0"
 								class="expanded-datatable">
-								<template v-slot:[`item.budget`]="{ item }">
-									<span>{{ item.budget.toLocaleString() || 0 }}</span>
-								</template>
-								<template v-slot:[`item.total`]="{ item }">
-									{{item.total.toLocaleString()}}
+								<template v-slot:[`item.payed`]="{ item }">
+									{{item.payed.toLocaleString() || 0 }}
 								</template>
 							</v-data-table>
 						</td>
 					</template>
-					<template v-slot:[`item.total`]="{ item }">
-						{{item.total.toLocaleString()}}
+					<template v-slot:[`item.budget`]="{ item }">
+						{{item.budget.toLocaleString()}}
 					</template>
 					<template v-slot:[`item.createdAt`]="{ item }">
 						<span>{{ new Date(item.createdAt).toLocaleString() }}</span>
@@ -74,7 +71,7 @@
 				disable-pagination
 				hide-default-footer
 				fixed-header
-					height="75vh"
+				height="75vh"
 				:items="selectedSupplier.payments"
 				mobile-breakpoint="0"
 				>
@@ -82,8 +79,8 @@
 						<v-toolbar flat>
 							<v-toolbar-title>תשלומים 
 									{{selectedSupplier.payments[0].project}} - 
-									{{selectedSupplier.supplier.name}} -
-									{{selectedSupplier.total.toLocaleString()}}
+									{{selectedSupplier.payments[0].supplier}} -
+									<!-- {{selectedSupplier.total.toLocaleString()}} -->
 							</v-toolbar-title>
 							<v-spacer></v-spacer>
 						</v-toolbar>
@@ -144,14 +141,14 @@ export default {
 			headers: [
 				{ text: 'Name', value: 'name', align:'end' },
 				{ text: 'Budget', value: 'budget', align:'end' },
-				{ text: 'Payed', value: 'total', align:'end' },
+				// { text: 'Payed', value: 'total', align:'end' },
 				// { text: 'Date Created', value: 'createdAt' },
 				{ text: 'Controls', value: 'controls' },
 			],
 			supplierHeaders: [
-				{ text: 'Supplier', value: 'supplier.name' },
-				{ text: 'Budget', value: 'budget', align:'end' },
-				{ text: 'Payed', value: 'total', align:'end' },
+				{ text: 'Supplier', value: 'supplier' },
+				// { text: 'Budget', value: 'budget', align:'end' },
+				{ text: 'Payed', value: 'payed', align:'end' },
 			],
 			paymentsHeaders: [
 				// { text: 'Project', value: 'project' },
@@ -173,6 +170,7 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllProjectsData();
 				if(response.data && response.data.success) {
 					this.projects = response.data.projects;
+					console.log(this.projects)
 				}
 			} catch (error) {
 				console.log(error);
