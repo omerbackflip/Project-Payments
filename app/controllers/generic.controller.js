@@ -23,7 +23,7 @@ exports.findAll = async (req, res) => {
 	try {
 		const query = {... req.query};
 		const model = req.query.model;
-		delete query.model;
+		// delete query.model; dont need this line
 		let data = await dbService.getMultipleItems(db[model], req.query);
 		return res.send(data);
 	} catch (error) {

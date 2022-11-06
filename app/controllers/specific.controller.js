@@ -2,6 +2,7 @@ const db = require("../models");
 const Project = db.projects;
 const Supplier = db.suppliers;
 const Payment = db.payments;
+const Table = db.tables;
 const dbService = require("../services/db-service");
 const paymentService = require("../services/payment-service");
 const csv = require('csvtojson');
@@ -12,12 +13,22 @@ const { suppliers } = require("../models");
 exports.savePaymentsBulk = async (req, res) => {
 
 	try {
-        await Promise.all([Project.remove(), Supplier.remove(), Payment.remove()]);
+        await Promise.all([Project.remove(), Supplier.remove(), Payment.remove(), Table.deleteMany()]);
 		let data = await csv().fromFile(`uploads/${req.file.filename}`);
-        const {suppliers , payments} = paymentService.getSuppliersAndPaymentsToSave(data);
+        const {projects1, suppliers , payments} = paymentService.getProjectsAndSuppliersAndPaymentsToSave(data);
+        let suppList = suppliers;
+        let projList = projects1;
+        suppList = suppliers.map((item) =>{
+            return ( { 'table_id' : '1' , 'description' : item.name})
+        });
+        projList = projects1.map((item) =>{
+            return ( { 'table_id' : '2' , 'description' : item.name})
+        });
         const [savedSuppliers , savedPayments] = await Promise.all([
             dbService.insertMany(Supplier,suppliers),
             dbService.insertMany(Payment,payments),
+            dbService.insertMany(Table,suppList),
+            dbService.insertMany(Table,projList),
         ]);
 
         const projects = paymentService.getProjectsToSave(savedSuppliers , savedPayments);
@@ -42,8 +53,8 @@ exports.deleteProjectAndData = async (req, res) => {
                     payments: [project._id],
                 },
             })
-        ]);        
-        
+        ]);
+
         return res.send({ success: true, message: "Project and it's data successfully deleted!"});
 
 	} catch (error) {
@@ -54,21 +65,8 @@ exports.deleteProjectAndData = async (req, res) => {
 
 exports.getMainViewProjectData = async (req, res) => {
     try {
-        // let projects = await Project.find().populate('suppliers.supplier').populate('suppliers.payments').lean();
         let projects = await Project.find().lean();
         if( projects && projects.length) {
-            // for (i=0;i<projects.length;i++){
-            //     let projectSum = 0;
-            //     for (j=0;j<projects[i].suppliers.length;j++){
-            //         let supplierSum = 0;
-            //         for (k=0;k<projects[i].suppliers[j].payments.length;k++){
-            //             supplierSum += projects[i].suppliers[j].payments[k].amount;
-            //         }
-            //         projects[i].suppliers[j].total = supplierSum;
-            //         projectSum += supplierSum;
-            //     }
-            //     projects[i].total = projectSum;
-            // }
             if(projects && projects.length) {
                 await Promise.all(projects.map(async project => {
                     project.suppliers = await Payment.find({"project" : project.name}, 'supplier').lean();
@@ -80,13 +78,13 @@ exports.getMainViewProjectData = async (req, res) => {
                             supplier.payments = await Payment.find({supplier: supplier.supplier , project: project.name}).lean();
                             supplier.payed = supplier.payments.reduce((payed, item) => {
                                 return item.amount + payed
-                            }, 0) 
+                            }, 0)
                         }));
                     }
                 }))
-            } 
+            }
             return res.send({success: true, projects});
-        }       
+        }
     } catch (error) {
         console.log(error)
 		res.status(500).send({ message: "Error getting main view project data", error });
@@ -95,7 +93,11 @@ exports.getMainViewProjectData = async (req, res) => {
 
 exports.getMainViewSupplierData = async (req, res) => {
     try {
-        let suppliers = await Supplier.find().lean();
+        // let suppliers = await Supplier.find().lean();
+        let suppliers = await Table.find({table_id : '1' }).lean();
+        suppliers = suppliers.map((item) => {
+            return ({name : item.description})
+        })
         if(suppliers && suppliers.length) {
             await Promise.all(suppliers.map(async supplier => {
                 supplier.projects = await Payment.find({"supplier" : supplier.name}, 'project').lean();
@@ -107,13 +109,12 @@ exports.getMainViewSupplierData = async (req, res) => {
                         project.payments = await Payment.find({supplier: supplier.name , project: project.project}).lean();
                         project.payed = project.payments.reduce((payed, item) => {
                             return item.amount + payed
-                        }, 0) 
+                        }, 0)
                     }));
                 }
             }))
+            return res.send({success: true, suppliers});
         }
-        return res.send({success: true, suppliers});
-
     } catch (error) {
         console.log(error)
 		res.status(500).send({ message: "Error getting main view supplier data", error });

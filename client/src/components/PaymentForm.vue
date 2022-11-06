@@ -36,7 +36,7 @@
                         </v-col>
                         <v-col cols="4">
                             <v-select class="mt-6"
-                                :items="currentSuppliers"
+                                :items="suppliers"
                                 v-model="payment.supplier"
                                 label="Supplier"
                                 dense
@@ -77,7 +77,8 @@
 </template>
 
 <script>
-import { PAYMENT_MODEL, PROJECT_MODEL, SUPPLIER_MODEL } from '../constants/constants';
+// import { PAYMENT_MODEL, PROJECT_MODEL, SUPPLIER_MODEL, TABLE_MODEL } from '../constants/constants';
+import { PAYMENT_MODEL, TABLE_MODEL } from '../constants/constants';
 // import moment from 'moment';
 import apiService from "../services/apiService";
 export default {
@@ -98,8 +99,8 @@ export default {
           remark:       "",
         },  
         projects: [],
+        suppliers: [],
         dialog: false,
-        currentSuppliers: [],
         dateModal : false,
         disabled: false,
       }
@@ -120,12 +121,19 @@ export default {
         },
         async getAllProjectsAndSuppliers() {
             try {
+                // const [projects,suppliers] = await Promise.all([
+                //     apiService.get({model: PROJECT_MODEL}),
+                //     apiService.get({model: SUPPLIER_MODEL}),
+                // ]);
+                // this.projects = projects.data.map(project => project.name);
+                // this.suppliers = suppliers.data.map(supplier => supplier.name);
+
                 const [projects,suppliers] = await Promise.all([
-                    apiService.get({model: PROJECT_MODEL}),
-                    apiService.get({model: SUPPLIER_MODEL}),
+                    apiService.get({model: TABLE_MODEL , table_id : 2}), // get projects list from TABLE
+                    apiService.get({model: TABLE_MODEL , table_id : 1}), // get suppliers list from TABLE
                 ]);
-                this.projects = projects.data.map(project => project.name);
-                this.currentSuppliers = suppliers.data.map(supplier => supplier.name);
+                this.projects = projects.data.map(project => project.description);
+                this.suppliers = suppliers.data.map(supplier => supplier.description);
             } catch (error) {
                 console.log(error);
             }

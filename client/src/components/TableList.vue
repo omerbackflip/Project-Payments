@@ -16,7 +16,7 @@
           disable-pagination
           hide-default-footer
           fixed-header
-          height="75vh"
+          height="35vh"
           @click:row="filterTbl"
           dense
           class="elevation-3"

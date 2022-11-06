@@ -1,7 +1,10 @@
-exports.getSuppliersAndPaymentsToSave = (data) => {
+exports.getProjectsAndSuppliersAndPaymentsToSave = (data) => {
     try {
         const uniqueSuppliers = [...new Set(data.map(item => item.supplier))];
         const suppliers = uniqueSuppliers.map(item => {return {name: item}});
+
+        const uniqueProjects = [...new Set(data.map(item => item.project))];
+        const projects1 = uniqueProjects.map(item => {return {name: item}});
 
         let payments = [];
 
@@ -22,7 +25,7 @@ exports.getSuppliersAndPaymentsToSave = (data) => {
             payments.push(payment);
         });
 
-        return { suppliers , payments };
+        return { projects1, suppliers , payments };
 
     } catch (error) {
         console.log(error)
@@ -32,7 +35,6 @@ exports.getSuppliersAndPaymentsToSave = (data) => {
 
 exports.getProjectsToSave = (suppliers,payments) => {
     let projects = [] , projectIndex = -1 , supplierIndex = -1 , supplierId = 0;
-    
     if(payments && payments.length) {
         payments.map(async payment => {
 
