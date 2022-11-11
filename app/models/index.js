@@ -10,5 +10,6 @@ db.tables = require("./table.model.js")(mongoose);
 db.projects = require("./project.model.js")(mongoose);
 db.suppliers = require("./supplier.model.js")(mongoose);
 db.payments = require("./payment.model.js")(mongoose);
+db.books = require("./book.model.js")(mongoose);
 
 module.exports = db; 

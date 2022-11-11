@@ -43,7 +43,7 @@
         </v-navigation-drawer>
 
         <template v-if="openImportModal">
-            <ImportPayments :openImportModal="openImportModal" :setImportModal="toggleModal" />
+            <ImportPayments :openImportModal="openImportModal" :setImportModal="toggleModal" :importData="importData"/>
         </template>
         <template v-if="dialog">
             <Payment :onPaymentFormClose="onPaymentFormClose" :supplierList="supplierList" title="New Payment" :paymentToUpdate="null"/>
@@ -67,10 +67,12 @@ export default {
         return {
             drawer: false,
             openImportModal: false,
+            importData: [], // PaymentsCsvData or BooksCsvData
             links: [
                 {icon: 'mdi-view-dashboard', text: 'Main View', route: '/'},
                 {icon: 'mdi-cash-multiple', text: 'Payments', route: '/payments'},
                 {icon: 'mdi-arrow-up-bold-box-outline', text: 'Import payments', route: null , onClick: this.toggleModal},
+                {icon: 'mdi-arrow-up-bold-box-outline', text: 'Import books', route: null , onClick: this.toggleBook},
                 {icon: 'mdi-briefcase-check', text: 'Project list', route: '/project-list'},
                 {icon: 'mdi-account-multiple-check', text: 'Supplier list', route: '/supplier-list'},
                 {icon: 'mdi-file-table-box-multiple', text: 'Table list', route: '/table-list'},
@@ -91,8 +93,12 @@ export default {
             this.$root.$emit('onSupplierChange',event);
         },
         toggleModal() {
+            this.importData = "PAYMENTS";
             this.openImportModal = !this.openImportModal;
-            console.log(this.openImportModal);
+        },
+        toggleBook() {
+            this.importData = "BOOKS";
+            this.openImportModal = !this.openImportModal;
         },
         getValues(count,total, supplierList) {
             if(supplierList) {

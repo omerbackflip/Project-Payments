@@ -13,6 +13,16 @@ class SpecificServiceEndPoints {
 		});
 	}
 
+	async saveBooksImport(file,company,importYear) {
+		var formData = new FormData();
+		formData.append("file", file);
+		return await axios.post(`${baseUrl}/specific/save-books`, formData ,{params:{company, importYear}},{ 
+			headers: {
+				'Content-Type': 'multipart/form-data'
+			}
+		});
+	}
+
 	async deleteProjectAndCorrespondingData(projectId) {
 		return await http.put(`${baseUrl}/specific/delete-project/${projectId}`);
 	}

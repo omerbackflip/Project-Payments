@@ -71,7 +71,7 @@
 				disable-pagination
 				hide-default-footer
 				fixed-header
-				height="75vh"
+				height="55vh"
 				:items="selectedSupplier.payments"
 				mobile-breakpoint="0"
 				>

@@ -3,41 +3,8 @@
 		<v-dialog v-model="dialog" width="500">
 			<v-card>
 				<v-card-title class="text-h5 grey lighten-2">
-					{{ importData }}
+					Import Books
 				</v-card-title>
-
-                <div class="radioBtn" v-show="importData==='BOOKS'">
-					<v-row>
-						<v-col>
-							<v-radio-group v-model="company">
-								<v-radio
-									label="ביצועים"
-									value="ביצועים"
-								></v-radio>
-								<v-radio
-									label="יזמות"
-									value="יזמות"
-								></v-radio>
-							</v-radio-group>
-						</v-col>
-						<v-col>
-							<v-radio-group v-model="importYear">
-								<v-radio
-									label="2020"
-									value="2020"
-								></v-radio>
-								<v-radio
-									label="2021"
-									value="2021"
-								></v-radio>
-								<v-radio
-									label="2022"
-									value="2022"
-								></v-radio>
-							</v-radio-group>
-						</v-col>
-					</v-row>
-                </div>
 
 				<v-card-text> Please select file to import </v-card-text>
 				<v-file-input @change="setFile"></v-file-input>
@@ -70,15 +37,12 @@ export default {
 	props: {
 		openImportModal: Boolean,
 		setImportModal: Function,
-		importData:[],
 	},
 	data() {
 		return {
 			file: null,
 			message: "",
 			dialog: false,
-			company: '',
-			importYear: '',
 		};
 	},
 	methods: {
@@ -90,14 +54,12 @@ export default {
 		},
 		async submitFile() {
 			try {
-				const response = (this.importData === "PAYMENTS")
-									? await SpecificServiceEndPoints.savePaymentsImport(this.file)
-									: await SpecificServiceEndPoints.saveBooksImport(this.file,this.company,this.importYear) ;
+				const response = await SpecificServiceEndPoints.saveBooksImport(this.file);
 				if (response.data && response.data.success) {
-					this.message = "Payments successfully imported";
+					this.message = "Books successfully imported";
 					setTimeout(() => {
 						this.toggleDialog();
-					}, 3500);
+					}, 1500);
 					window.location.reload();
 				}
 			} catch (error) {

@@ -3,17 +3,19 @@ const Project = db.projects;
 const Supplier = db.suppliers;
 const Payment = db.payments;
 const Table = db.tables;
+const Book = db.books;
 const dbService = require("../services/db-service");
 const paymentService = require("../services/payment-service");
 const csv = require('csvtojson');
 const fs = require('fs');
 var mongoose = require('mongoose');
 const { suppliers } = require("../models");
+const { query } = require("express");
 
 exports.savePaymentsBulk = async (req, res) => {
 
 	try {
-        await Promise.all([Project.remove(), Supplier.remove(), Payment.remove(), Table.deleteMany()]);
+        await Promise.all([Project.deleteMany(), Supplier.deleteMany(), Payment.deleteMany(), Table.deleteMany()]);
 		let data = await csv().fromFile(`uploads/${req.file.filename}`);
         const {projects1, suppliers , payments} = paymentService.getProjectsAndSuppliersAndPaymentsToSave(data);
         let suppList = suppliers;
@@ -34,11 +36,55 @@ exports.savePaymentsBulk = async (req, res) => {
         const projects = paymentService.getProjectsToSave(savedSuppliers , savedPayments);
         await dbService.insertMany(Project,projects);
         unLinkFile(`uploads/${req.file.filename}`);
-        return res.send({ success: true, message: "Data successfully Imported"});
+        return res.send({ success: true, message: `Total ${projects.length} projects successfully Imported`});
 
 	} catch (error) {
 		console.log(error)
 		res.status(500).send({ message: "Error saving payments", error });
+	}
+};
+
+exports.saveBooksBulk = async (req, res) => {
+
+	try {
+        await Promise.all([Book.deleteMany()]);
+        // console.log(req.query)
+		let data = await csv().fromFile(`uploads/${req.file.filename}`);
+
+        let books = [];
+
+        data.forEach(item => {
+            if(item.asmchta_date) {
+                const [day,month,year] = item.asmchta_date.split('/')
+                let book = {
+                    company: req.query.company,
+                    asmchta_date: new Date(+year, +month - 1, +day),
+                    record_id: item.record_id,
+                    year: item.year,
+                    record_schum: item.record_schum,
+                    pratim: item.pratim,
+                    asmacta1: item.asmacta1,
+                    schum_hova: item.schum_hova,
+                    schum_zchut: item.schum_zchut,
+                    cust_lname: item.cust_lname,
+                    cust_fname: item.cust_fname,
+                    bs_item_name: item.bs_group_name,
+                    bs_group_name: item.bs_item_name,
+                }
+                books.push(book);
+            }
+        });
+
+        const [savedBooks] = await Promise.all([
+            dbService.insertMany(Book,books),
+        ]);
+
+        unLinkFile(`uploads/${req.file.filename}`);
+        return res.send({ success: true, message: `Total ${savedBooks.length} books successfully Imported`});
+
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Error saving books", error });
 	}
 };
 
@@ -120,7 +166,6 @@ exports.getMainViewSupplierData = async (req, res) => {
 		res.status(500).send({ message: "Error getting main view supplier data", error });
     }
 }
-
 
 exports.addSupplierBudgetsToProject = async(req,res) => {
     try {
