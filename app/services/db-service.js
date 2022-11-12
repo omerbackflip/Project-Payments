@@ -42,7 +42,7 @@ exports.insertMany = async (model,payload) => {
 
 exports.deleteItem = async (model,query) => {
     try {
-        return await model.remove(query);
+        return await model.deleteOne(query);
     } catch (error) {
         console.log(error)
         throw error;

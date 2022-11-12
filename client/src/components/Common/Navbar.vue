@@ -69,12 +69,11 @@ export default {
             openImportModal: false,
             importData: [], // PaymentsCsvData or BooksCsvData
             links: [
-                {icon: 'mdi-view-dashboard', text: 'Main View', route: '/'},
+                {icon: 'mdi-briefcase-check', text: 'Project list', route: '/'},
+                {icon: 'mdi-account-multiple-check', text: 'Supplier list', route: '/supplier-list'},
                 {icon: 'mdi-cash-multiple', text: 'Payments', route: '/payments'},
                 {icon: 'mdi-arrow-up-bold-box-outline', text: 'Import payments', route: null , onClick: this.toggleModal},
                 {icon: 'mdi-arrow-up-bold-box-outline', text: 'Import books', route: null , onClick: this.toggleBook},
-                {icon: 'mdi-briefcase-check', text: 'Project list', route: '/project-list'},
-                {icon: 'mdi-account-multiple-check', text: 'Supplier list', route: '/supplier-list'},
                 {icon: 'mdi-file-table-box-multiple', text: 'Table list', route: '/table-list'},
             ],
             supplierList : ['All'],
