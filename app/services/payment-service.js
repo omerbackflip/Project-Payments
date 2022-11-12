@@ -1,5 +1,6 @@
 exports.getProjectsAndSuppliersAndPaymentsToSave = (data) => {
     try {
+
         const uniqueSuppliers = [...new Set(data.map(item => item.supplier))];
         const suppliers = uniqueSuppliers.map(item => {return {name: item}});
 
@@ -16,7 +17,7 @@ exports.getProjectsAndSuppliersAndPaymentsToSave = (data) => {
                 vat: item.vat,
                 paymentMethod: item.payMethod,
                 remark: item.remark,				
-                date: new Date(item.date),
+                date: item.date ? new Date(item.date) : Date.now(),
                 supplier: item.supplier,
                 clear: item.clear,
                 invoiceId: item.invoiceId,

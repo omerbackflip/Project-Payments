@@ -7,10 +7,8 @@ module.exports = mongoose => {
 			name: String,
 			budget: {type: Number, default: 0},
 			suppliers: [{
-				supplier: {type: Schema.Types.ObjectId, ref: 'supplier'},
 				name: String,
-				budget: {type: Number , default: 0},
-				payments: [{ type: Schema.Types.ObjectId, ref: 'payment' }],	
+				budget: {type: Number , default: 0},	
 			}],
 		},
 		{ timestamps: true }

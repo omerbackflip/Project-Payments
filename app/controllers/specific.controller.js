@@ -18,17 +18,18 @@ exports.savePaymentsBulk = async (req, res) => {
         await Promise.all([Project.deleteMany(), Supplier.deleteMany(), Payment.deleteMany(), Table.deleteMany()]);
 		let data = await csv().fromFile(`uploads/${req.file.filename}`);
         const {projects1, suppliers , payments} = paymentService.getProjectsAndSuppliersAndPaymentsToSave(data);
-        let suppList = suppliers;
-        let projList = projects1;
-        suppList = suppliers.map((item) =>{
+        let suppList = [...suppliers];
+        let projList = [...projects1];
+        suppList = suppList.map((item) =>{
             return ( { 'table_id' : '1' , 'description' : item.name})
         });
-        projList = projects1.map((item) =>{
+        projList = projList.map((item) =>{
             return ( { 'table_id' : '2' , 'description' : item.name})
         });
         const [savedSuppliers , savedPayments] = await Promise.all([
             dbService.insertMany(Supplier,suppliers),
             dbService.insertMany(Payment,payments),
+            dbService.insertMany(Project,projects1),
             dbService.insertMany(Table,suppList),
             dbService.insertMany(Table,projList),
         ]);
