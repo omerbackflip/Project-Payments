@@ -48,13 +48,12 @@ exports.saveBooksBulk = async (req, res) => {
 
 	try {
         await Promise.all([Book.deleteMany()]);
-        // console.log(req.query)
 		let data = await csv().fromFile(`uploads/${req.file.filename}`);
 
         let books = [];
 
         data.forEach(item => {
-            if(item.asmchta_date) {
+            if(item.asmchta_date) { // exclude empty rows in the CSV Book
                 const [day,month,year] = item.asmchta_date.split('/')
                 let book = {
                     company: req.query.company,
