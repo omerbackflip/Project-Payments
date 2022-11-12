@@ -19,13 +19,13 @@
                 <v-container>
                     <div v-for="(textField, i) in project.suppliers" :key="i" class="text-fields-row">
                         <v-row>
-                            <v-col cols="4">
+                            <v-col cols="4" sm="6">
                                 <v-select class="mt-5" :items="currentSuppliers" v-model="textField.name" label="Supplier" dense></v-select>
                             </v-col>
-                            <v-col cols="4">
+                            <v-col cols="4" sm="6">
                                 <v-text-field label="Budget" v-model="textField.budget" ></v-text-field>
                             </v-col>
-                            <v-col cols="2">
+                            <v-col cols="2" sm="6">
                                 <v-btn @click="removeBudgetField(i)" class="error"><v-icon small >mdi-delete</v-icon></v-btn>
                             </v-col>
                         </v-row>
@@ -144,9 +144,17 @@ export default {
 </script>
 
 <style scoped>
-    .budgets-wrapper{
-        border: 10px solid #85a7ff;
-        margin: 20px;
-        padding: 20px;
+
+
+    @media only screen and (min-width: 363px) and (max-width: 800px) {
+        .v-select__selection{
+            white-space: normal;
+            font-size: 9px;
+        }
+        .error{
+            margin-top: 12px;
+            right: 15px;
+        }
     }
+
 </style>
