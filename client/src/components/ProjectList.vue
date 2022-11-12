@@ -119,7 +119,7 @@
 
 
 <script>
-import { PAYMENT_MODEL } from "../constants/constants";
+import { PAYMENT_MODEL, PROJECT_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import ConfirmDialog from './Common/ConfirmDialog.vue';
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
@@ -186,7 +186,9 @@ export default {
 			try {
 				if(id) {
 					if(await this.$refs.confirm.open( "Confirm", "Are you sure to delete this project? This will also delete all related payments")){
-						await specificServiceEndPoints.deleteProjectAndCorrespondingData(id);
+						// await specificServiceEndPoints.deleteProjectAndCorrespondingData(id);
+						let params = {model:PROJECT_MODEL, id:id}
+						await apiService.deleteOne(params)
 						this.getProjects();
 					}
 				}

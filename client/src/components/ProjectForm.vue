@@ -14,7 +14,7 @@
             </div>
             <v-text-field class="field-margin" v-model="project.name" label="Name"></v-text-field>
             <v-text-field class="field-margin" v-model="project.budget" label="Budget"></v-text-field>
-            <div class="budgets-wrapper">
+            <div class="suppliers-wrapper">
                 <h3>Suppliers</h3>
                 <v-container>
                     <div v-for="(textField, i) in project.suppliers" :key="i" class="text-fields-row">
@@ -86,8 +86,9 @@ export default {
                             response.data.data._id, 
                             this.project.suppliers.map(item => {
                                 return {
-                                    supplier: this.allSuppliers[ this.allSuppliers.findIndex(supplier => item.name === supplier.name) ]._id,
-                                    payments: item.payments,
+                                    // supplier: this.allSuppliers[ this.allSuppliers.findIndex(supplier => item.name === supplier.name) ]._id,
+                                    // payments: item.payments,
+                                    name: item.name,
                                     budget: item.budget
                                 };
                             })
@@ -122,15 +123,15 @@ export default {
 		},
         open(project, newProject) {
             this.newProject = newProject;
-            this.project = newProject ? {name: '' , budget: '' , suppliers: []} : {
-                ...project,
-                suppliers: project.suppliers.map(item => {
-                    return {
-                        name: item.supplier.name,
-                        budget: item.budget,
-                        payments: item.payments
-                    }
-            })};
+            this.project = newProject 
+                ? {name: '' , budget: 0 , suppliers: []} 
+                : {...project,
+                    suppliers: project.suppliers.map(item => {
+                        return {
+                            name: item.supplier,
+                            budget: item.budget,
+                        }})
+                  };
             this.dialog = true;
             return new Promise((resolve) => {
                 this.resolve = resolve;
@@ -144,7 +145,7 @@ export default {
 </script>
 
 <style scoped>
-    .budgets-wrapper{
+    .suppliers-wrapper{
         border: 10px solid #85a7ff;
         margin: 20px;
         padding: 20px;

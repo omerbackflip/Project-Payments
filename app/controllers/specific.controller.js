@@ -92,12 +92,12 @@ exports.deleteProjectAndData = async (req, res) => {
         const project = await Project.findOne({_id: req.params.projectId});
         await Promise.all([
             Project.deleteOne({_id: project._id}),
-            Payment.deleteMany({project: project.name}),
-            Supplier.updateMany({}, {
-                $pullAll: {
-                    payments: [project._id],
-                },
-            })
+            // Payment.deleteMany({project: project.name}),
+            // Supplier.updateMany({}, {
+            //     $pullAll: {
+            //         payments: [project._id],
+            //     },
+            // })
         ]);
 
         return res.send({ success: true, message: "Project and it's data successfully deleted!"});
@@ -108,6 +108,7 @@ exports.deleteProjectAndData = async (req, res) => {
 	}
 };
 
+// Build Projects structure data from PAYMENTs :   Projects => Suppliers => payments
 exports.getMainViewProjectData = async (req, res) => {
     try {
         let projects = await Project.find().lean();
@@ -136,6 +137,7 @@ exports.getMainViewProjectData = async (req, res) => {
     }
 }
 
+// Build Suppliers structure data from PAYMENTs :   Suppliers => Projects => payments
 exports.getMainViewSupplierData = async (req, res) => {
     try {
         // let suppliers = await Supplier.find().lean();
@@ -171,9 +173,10 @@ exports.addSupplierBudgetsToProject = async(req,res) => {
         const { projectId } = req.params;
         const supplierBudgets = req.body.map(item => {
             return {
-                supplier: mongoose.Types.ObjectId(item.supplier),
+                // supplier: mongoose.Types.ObjectId(item.supplier),
+                name: item.name,
                 budget: item.budget,
-                payments: item.payments
+                // payments: item.payments
             }
         });
 
