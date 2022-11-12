@@ -29,7 +29,6 @@ exports.savePaymentsBulk = async (req, res) => {
         const [savedSuppliers , savedPayments] = await Promise.all([
             dbService.insertMany(Supplier,suppliers),
             dbService.insertMany(Payment,payments),
-            dbService.insertMany(Project,projects1),
             dbService.insertMany(Table,suppList),
             dbService.insertMany(Table,projList),
         ]);

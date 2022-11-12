@@ -35,29 +35,20 @@ exports.getProjectsAndSuppliersAndPaymentsToSave = (data) => {
 }
 
 exports.getProjectsToSave = (suppliers,payments) => {
-    let projects = [] , projectIndex = -1 , supplierIndex = -1 , supplierId = 0;
+    let projects = [] , projectIndex = -1 , supplierIndex = -1 , supplierName = '';
     if(payments && payments.length) {
         payments.map(async payment => {
 
-            supplierId = suppliers[suppliers.findIndex(supplier => supplier.name === payment.supplier)]._id;
+            supplierName = suppliers[suppliers.findIndex(supplier => supplier.name === payment.supplier)].name;
             projectIndex = projects.findIndex(project => project.name === payment.project);
 
             if(projectIndex >= 0) {
-                supplierIndex = projects[projectIndex].suppliers.findIndex(supplier => String(supplier.supplier) === String(supplierId));
-                if(supplierIndex >= 0) {
-                    projects[projectIndex].suppliers[supplierIndex].payments.push(payment._id);
-                    return;
-                }
-                projects[projectIndex].suppliers.push({payments: [payment._id] , supplier: supplierId });
+                supplierIndex = projects[projectIndex].suppliers.findIndex(supplier => supplier.name === supplierName);
+                if(supplierIndex >= 0) return;
+                projects[projectIndex].suppliers.push({ name: supplierName });
                 return;
             }    
-            projects.push({ 
-                name: payment.project,  
-                suppliers: [{
-                    payments: [payment._id], 
-                    supplier: supplierId
-                }], 
-            });
+            projects.push({ name: payment.project, suppliers: [{ name: supplierName}] });
         });
     }
     return projects;
