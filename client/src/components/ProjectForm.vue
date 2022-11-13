@@ -19,18 +19,18 @@
                 <v-container>
                     <div v-for="(textField, i) in project.suppliers" :key="i" class="text-fields-row">
                         <v-row>
-                            <v-col cols="4">
+                            <v-col cols="6">
                                 <v-select class="mt-5" :items="currentSuppliers" v-model="textField.name" label="Supplier" dense></v-select>
                             </v-col>
                             <v-col cols="4">
                                 <v-text-field label="Budget" v-model="textField.budget" ></v-text-field>
                             </v-col>
                             <v-col cols="2">
-                                <v-btn @click="removeBudgetField(i)" class="error"><v-icon small >mdi-delete</v-icon></v-btn>
+                                <v-btn @click="removeBudgetField(i)" class="error" x-small ><v-icon small >mdi-delete</v-icon></v-btn>
                             </v-col>
                         </v-row>
                     </div>                    
-                    <v-btn @click="addBudgetField" class="primary"><v-icon small >mdi-plus</v-icon></v-btn>					
+                    <v-btn @click="addBudgetField" class="primary" small><v-icon small >mdi-plus</v-icon></v-btn>					
                 </v-container>
 
             </div>
@@ -132,6 +132,7 @@ export default {
                             budget: item.budget,
                         }})
                   };
+            console.log(this.project)
             this.dialog = true;
             return new Promise((resolve) => {
                 this.resolve = resolve;
@@ -146,8 +147,15 @@ export default {
 
 <style scoped>
     .suppliers-wrapper{
-        border: 10px solid #85a7ff;
-        margin: 20px;
-        padding: 20px;
+        border: 5px solid #85a7ff;
+        margin: 2px;
+        padding: 0px;
+    }
+    .container{
+        padding-right: 3px;
+        padding-left: 3px;        
+    }
+    .col.col-2{
+        align-self: center;
     }
 </style>

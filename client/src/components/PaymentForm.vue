@@ -111,7 +111,9 @@ export default {
                 if (this.paymentToUpdate) {
                     apiService.update(this.payment._id, this.payment, {model: PAYMENT_MODEL });
                 } else {
-                    apiService.create(this.payment , {model: PAYMENT_MODEL , middleware: 'addPaymentToSupplierMiddleWare'});
+                    // Dont need this since changes in Project table
+                    // apiService.create(this.payment , {model: PAYMENT_MODEL , middleware: 'addPaymentToSupplierMiddleWare'});
+                    apiService.create(this.payment , {model: PAYMENT_MODEL});
                 }
                 window.location.reload();
                 this.dialog = false;   

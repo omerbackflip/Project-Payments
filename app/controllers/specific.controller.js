@@ -112,25 +112,25 @@ exports.deleteProjectAndData = async (req, res) => {
 exports.getMainViewProjectData = async (req, res) => {
     try {
         let projects = await Project.find().lean();
-        if( projects && projects.length) {
-            if(projects && projects.length) {
-                await Promise.all(projects.map(async project => {
-                    project.suppliers = await Payment.find({"project" : project.name}, 'supplier').lean();
-                    project.suppliers = project.suppliers.filter((value, index, self) =>
-                        index === self.findIndex((t) => ( t.supplier === value.supplier))
-                    )
-                    if(project.suppliers && project.suppliers.length) {
-                        await Promise.all(project.suppliers.map(async supplier=> {
-                            supplier.payments = await Payment.find({supplier: supplier.supplier , project: project.name}).lean();
-                            supplier.payed = supplier.payments.reduce((payed, item) => {
-                                return item.amount + payed
-                            }, 0)
-                        }));
-                    }
-                }))
-            }
-            return res.send({success: true, projects});
+        // if(projects && projects.length) {
+        if(projects && projects.length) {
+            await Promise.all(projects.map(async project => {
+                project.suppliers = await Payment.find({"project" : project.name}, 'supplier').lean();
+                project.suppliers = project.suppliers.filter((value, index, self) =>
+                    index === self.findIndex((t) => ( t.supplier === value.supplier))
+                )
+                if(project.suppliers && project.suppliers.length) {
+                    await Promise.all(project.suppliers.map(async supplier=> {
+                        supplier.payments = await Payment.find({supplier: supplier.supplier , project: project.name}).lean();
+                        supplier.payed = supplier.payments.reduce((payed, item) => {
+                            return item.amount + payed
+                        }, 0)
+                    }));
+                }
+            }))
         }
+        return res.send({success: true, projects});
+        // }
     } catch (error) {
         console.log(error)
 		res.status(500).send({ message: "Error getting main view project data", error });

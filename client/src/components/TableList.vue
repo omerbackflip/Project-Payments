@@ -248,7 +248,6 @@ export default {
         .then((response) => {
           this.tables = response.data;
           this.tableID = response.data.filter((item) => item.table_id === 99);
-          console.log(response)
         })
         .catch((e) => {
           console.log(e);
