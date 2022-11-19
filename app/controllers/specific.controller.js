@@ -27,9 +27,9 @@ exports.savePaymentsBulk = async (req, res) => {
             return ( { 'table_id' : '2' , 'description' : item.name})
         });
         const [savedSuppliers , savedPayments] = await Promise.all([
-            dbService.insertMany(Supplier,suppliers),
-            dbService.insertMany(Payment,payments),
             dbService.insertMany(Table,suppList),
+            // dbService.insertMany(Supplier,suppliers),
+            dbService.insertMany(Payment,payments),
             dbService.insertMany(Table,projList),
         ]);
 
@@ -112,7 +112,6 @@ exports.deleteProjectAndData = async (req, res) => {
 exports.getMainViewProjectData = async (req, res) => {
     try {
         let projects = await Project.find().lean();
-        // if(projects && projects.length) {
         if(projects && projects.length) {
             await Promise.all(projects.map(async project => {
                 project.suppliers = await Payment.find({"project" : project.name}, 'supplier').lean();
@@ -130,7 +129,6 @@ exports.getMainViewProjectData = async (req, res) => {
             }))
         }
         return res.send({success: true, projects});
-        // }
     } catch (error) {
         console.log(error)
 		res.status(500).send({ message: "Error getting main view project data", error });
@@ -143,7 +141,7 @@ exports.getMainViewSupplierData = async (req, res) => {
         // let suppliers = await Supplier.find().lean();
         let suppliers = await Table.find({table_id : '1' }).lean();
         suppliers = suppliers.map((item) => {
-            return ({name : item.description})
+            return ({id: item._id , name : item.description}) // "id" is needed for later use (e.g for delete or update)
         })
         if(suppliers && suppliers.length) {
             await Promise.all(suppliers.map(async supplier => {
@@ -153,7 +151,7 @@ exports.getMainViewSupplierData = async (req, res) => {
                 )
                 if(supplier.projects && supplier.projects.length) {
                     await Promise.all(supplier.projects.map(async project=> {
-                        project.payments = await Payment.find({supplier: supplier.name , project: project.project}).lean();
+                        project.payments = await Payment.find({supplier: supplier.name, project: project.project}).lean();
                         project.payed = project.payments.reduce((payed, item) => {
                             return item.amount + payed
                         }, 0)

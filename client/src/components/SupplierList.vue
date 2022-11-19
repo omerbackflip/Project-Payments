@@ -21,7 +21,7 @@
 							<v-spacer></v-spacer>
 							<v-btn @click="dialog = true">
 								<v-icon class="nav-icon" small >mdi-plus</v-icon>
-								New Supplier
+								NEW SUPPLIER
 							</v-btn>
 						</v-toolbar>
 					</template>
@@ -46,7 +46,7 @@
 						<v-btn @click="updateSupplier(item)" x-small>
 							<v-icon small>mdi-pencil</v-icon>
 						</v-btn>
-						<v-btn class="ml-1" @click="deleteSupplier(item._id)" x-small>
+						<v-btn class="ml-1" @click="deleteSupplier(item)" x-small>
 							<v-icon small>mdi-delete</v-icon>
 						</v-btn>
 					</template>
@@ -57,19 +57,19 @@
 		<v-dialog v-model="dialog" width="500">
 			<v-card>
 				<v-card-title class="text-h5 grey lighten-2">
-					{{!update ? 'New' : 'Update'}} Supplier
+					{{supplier ? 'Update' : 'New'}} Supplier
 				</v-card-title>
 				<div class="field-margin" v-show="showMessage">
 					{{message}}
 				</div>
 				<v-text-field class="field-margin" v-model="supplier.name" label="Name"></v-text-field>
-				<v-text-field class="field-margin" v-model="supplier.budget" label="Budget"></v-text-field>
+				<!-- <v-text-field class="field-margin" v-model="supplier.budget" label="Budget"></v-text-field> -->
 
 				<v-divider></v-divider>
 
 				<v-card-actions>
 					<v-spacer></v-spacer>
-					<v-btn color="primary" text @click="dialog = false"> Close </v-btn>
+					<v-btn color="primary" text @click="onDialogSupplierClose()"> Close </v-btn>
 					<v-btn :disabled = "!supplier.name" color="primary" text @click="submitSupplier()"> Submit </v-btn>
 				</v-card-actions>
 			</v-card>
@@ -134,7 +134,7 @@
 
 
 <script>
-import { PAYMENT_MODEL, SUPPLIER_MODEL } from "../constants/constants";
+import { PAYMENT_MODEL, TABLE_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
 import ConfirmDialog from './Common/ConfirmDialog.vue';
@@ -150,7 +150,6 @@ export default {
 				budget: '',
 				name: '',
 			},
-			update: 0,
 			paymentToUpdate: null,
 			dialog: false,
 			projectPaymentsDialog: false,
@@ -189,7 +188,8 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllSuppliersData();
 				if(response && response.data) {
 					this.suppliers = response.data.suppliers
-				}
+		console.log(this.suppliers)
+				} // now suppliers is array which includes "name" + "id" from TABLE, "projects" (Array)
 			} catch (error) {
 				console.log(error);
 			}
@@ -209,15 +209,15 @@ export default {
 			this.projectPaymentsDialog = true;
 		},
 		updateSupplier(item) {
-			this.supplier = {name: item.name , budget: item.budget};
+			this.supplier = {id: item.id, name: item.name};
 			this.dialog = true;
-			this.update = item._id;
 		},
-		async deleteSupplier(id) {
+		async deleteSupplier(supplier) {
 			try {
-				if(id) {
-					if(await this.$refs.confirm.open( "Confirm", "Are you sure to delete this supplier? This will also delete all related payments")){
-						await apiService.deleteOne({ id , model: SUPPLIER_MODEL});
+				if(supplier) { 
+					if(await this.$refs.confirm.open( "Confirm Delete Supplier", "Are you sure to delete this supplier?")){
+						let id = supplier.id
+						await apiService.deleteOne({ id , model: TABLE_MODEL});
 						this.getSuppliers();
 					}
 				}
@@ -228,23 +228,30 @@ export default {
 		onPaymentFormClose() {
             this.paymentToUpdate = null;
         },
+		onDialogSupplierClose() {
+			this.supplier = '';
+			this.dialog = false;
+        },
 		async submitSupplier() {
 			try {
 				let response;
-				if(!this.update) {
-					response = await apiService.create(this.supplier , {model:SUPPLIER_MODEL});
-				} else {
-					response = await apiService.update(this.update , this.supplier , {model:SUPPLIER_MODEL});
+				let thisSupp = {description: this.supplier.name, table_id: 1};
+				if(this.supplier.id) { // if there is supplier.id --> means "update" 
+					let id = this.supplier.id;
+					response = await apiService.update(id, thisSupp, {model:TABLE_MODEL});
+					// need to add update supplier to relevant PAYMENTS
+				} else {	// if there is NO supplier.id --> means "create"
+					response = await apiService.create(thisSupp, {model:TABLE_MODEL});
 				}
 				if(response.data) {
 					this.message = 'Supplier successfully created/updated!';
 					this.showMessage = true;
 					this.getSuppliers();
-					this.update = 0;
+					this.supplier = '';
 					setTimeout(() => {
 						this.dialog = false;
 						this.showMessage = false;
-					}, 2000);
+					}, 3000);
 				}
 			} catch (error) {
 				console.log(error);

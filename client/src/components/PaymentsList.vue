@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import { SUPPLIER_MODEL,PAYMENT_MODEL } from '../constants/constants';
+import { TABLE_MODEL, PAYMENT_MODEL } from '../constants/constants';
 import apiService from "../services/apiService";
 import Payment from "./PaymentForm.vue";
 import ConfirmDialog from './Common/ConfirmDialog.vue';
@@ -158,8 +158,11 @@ export default {
         },
         async getSuppliersList() {
             try {
-                const response = await apiService.get({ model: SUPPLIER_MODEL});
-                this.suppliersList = response.data.map(supplier => supplier.name);
+                // const response = await apiService.get({ model: SUPPLIER_MODEL});
+                // this.suppliersList = response.data.map(supplier => supplier.name);
+                // console.log(this.suppliersList)
+                const response = await apiService.get({ model: TABLE_MODEL, table_id: 1});
+                this.suppliersList = response.data.map(supplier => supplier.description);
                 this.$emit("getData", null, null, this.suppliersList);
             } catch (error) {
                 console.log(error);

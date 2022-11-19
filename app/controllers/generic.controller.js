@@ -65,7 +65,7 @@ exports.delete = async (req, res) => {
 		const id = req.query.id;
 		const data = await dbService.deleteItem(db[req.query.model], {_id: id});
 		if(data) {
-			res.send({ message: "entity was updated successfully." });
+			res.send({ message: "entity was deleted successfully." });
 		} else {
 			res.status(404).send({message: `Cannot delete entity with id=${id}. Maybe entity was not found!`});
 		}
@@ -75,7 +75,7 @@ exports.delete = async (req, res) => {
 };
 
 
-//Delete all records with specified year - if year not specified - delete all data from the database:
+//Delete all Table
 exports.deleteAll = async (req, res) => {
 	try {
 		const query = {... req.query};

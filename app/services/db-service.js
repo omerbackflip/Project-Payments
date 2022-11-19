@@ -14,9 +14,12 @@ exports.getMultipleItems = async (model,query) => {
         throw error;
     }
 },
-exports.updateItem = async (model,query,paylod) => {
+exports.updateItem = async (model,query,payload) => {
     try {
-        return await model.findOneAndUpdate(query,paylod);
+        // console.log (model)  //  Model { table || project || payment ..... }
+        // console.log (query)  // { _id: '63767a0a4d89470120ae0195' }
+        // console.log (payload) // 
+        return await model.findOneAndUpdate(query,payload);
     } catch (error) {
         console.log(error)
         throw error;
@@ -24,6 +27,8 @@ exports.updateItem = async (model,query,paylod) => {
 },
 exports.createItem = async (model,payload) => {
     try {
+        // console.log (model)  //  Model { table || project || payment ..... }
+        // console.log (payload) // 
         return await model.create(payload);
     } catch (error) {
         console.log(error)
@@ -42,6 +47,8 @@ exports.insertMany = async (model,payload) => {
 
 exports.deleteItem = async (model,query) => {
     try {
+        // console.log (model)  //  Model { table || project || payment ..... }
+        // console.log (query)  // { _id: '63767a0a4d89470120ae0195' }
         return await model.deleteOne(query);
     } catch (error) {
         console.log(error)

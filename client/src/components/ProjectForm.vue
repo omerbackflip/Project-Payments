@@ -19,14 +19,14 @@
                 <v-container>
                     <div v-for="(textField, i) in project.suppliers" :key="i" class="text-fields-row">
                         <v-row>
-                            <v-col cols="6">
+                            <v-col cols="4">
                                 <v-select class="mt-5" :items="currentSuppliers" v-model="textField.name" label="Supplier" dense></v-select>
                             </v-col>
-                            <v-col cols="4">
+                            <v-col cols="4" sm="6">
                                 <v-text-field label="Budget" v-model="textField.budget" ></v-text-field>
                             </v-col>
                             <v-col cols="2">
-                                <v-btn @click="removeBudgetField(i)" class="error" x-small ><v-icon small >mdi-delete</v-icon></v-btn>
+                                <v-btn @click="removeBudgetField(i)" class="error"><v-icon small >mdi-delete</v-icon></v-btn>
                             </v-col>
                         </v-row>
                     </div>                    
@@ -46,7 +46,8 @@
 </template>
 
 <script>
-import { PROJECT_MODEL, SUPPLIER_MODEL } from "../constants/constants";
+import { PROJECT_MODEL, TABLE_MODEL } from "../constants/constants";
+// import { PROJECT_MODEL, SUPPLIER_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
 
@@ -55,7 +56,7 @@ export default {
     data() {
         return {
             currentSuppliers: [],
-            allSuppliers: [],
+            allSuppliers: [], // looks that this is not used
             project: {name: '' , budget: '', suppliers: []},
 			dialog: false,
             resolve: null,
@@ -108,8 +109,10 @@ export default {
 		},
 		async getAllProjectsAndSuppliers() {
             try {
-                const suppliers = await apiService.get({model: SUPPLIER_MODEL});
-                this.currentSuppliers = suppliers.data.map(supplier => supplier.name);
+                // const suppliers = await apiService.get({model: SUPPLIER_MODEL});
+                // this.currentSuppliers = suppliers.data.map(supplier => supplier.name);
+                const suppliers = await apiService.get({model: TABLE_MODEL, table_id: 1});
+                this.currentSuppliers = suppliers.data.map(supplier => supplier.description);
                 this.allSuppliers = suppliers.data;
             } catch (error) {
                 console.log(error);
@@ -132,7 +135,7 @@ export default {
                             budget: item.budget,
                         }})
                   };
-            console.log(this.project)
+            // console.log(this.project)
             this.dialog = true;
             return new Promise((resolve) => {
                 this.resolve = resolve;
@@ -147,15 +150,9 @@ export default {
 
 <style scoped>
     .suppliers-wrapper{
-        border: 5px solid #85a7ff;
-        margin: 2px;
-        padding: 0px;
+        border: 10px solid #85a7ff;
+        margin: 20px;
+        padding: 20px;
     }
-    .container{
-        padding-right: 3px;
-        padding-left: 3px;        
-    }
-    .col.col-2{
-        align-self: center;
-    }
+
 </style>

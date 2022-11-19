@@ -39,7 +39,7 @@ exports.getProjectsToSave = (suppliers,payments) => {
     if(payments && payments.length) {
         payments.map(async payment => {
 
-            supplierName = suppliers[suppliers.findIndex(supplier => supplier.name === payment.supplier)].name;
+            supplierName = suppliers[suppliers.findIndex(supplier => supplier.description === payment.supplier)].description;
             projectIndex = projects.findIndex(project => project.name === payment.project);
 
             if(projectIndex >= 0) {

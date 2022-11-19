@@ -109,6 +109,7 @@ export default {
         async savePayment() {
             try {
                 if (this.paymentToUpdate) {
+                    console.log(this.payment)
                     apiService.update(this.payment._id, this.payment, {model: PAYMENT_MODEL });
                 } else {
                     // Dont need this since changes in Project table
