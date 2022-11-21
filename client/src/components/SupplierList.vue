@@ -157,23 +157,23 @@ export default {
 			showMessage: false,
 			message: '',
 			headers: [
-				{ text: 'Name', value: 'name' },
+				{ text: 'Payed', value: 'payed' },
 				{ text: 'Budget', value: 'totalBudget' },
-				// { text: 'Date Created', value: 'createdAt' },
+				{ text: 'Name', value: 'name' },
 				{ text: 'Controls', value: 'controls' },
 			],
 			projectHeaders: [
-				{ text: 'Project', value: 'project'},
-				{ text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Payed', value: 'payed', align:'end' },
+				{ text: 'Budget', value: 'budget', align:'end' },
+				{ text: 'Project', value: 'project', align:'end'},
 			],
 			paymentsHeaders: [
 				// { text: 'Project', value: 'project' },
 				// { text: 'Vat', value: 'vat' },
 				// { text: 'Payment Method', value: 'paymentMethod' },
-				{ text: 'Date', value: 'date' },
-				{ text: 'Amount', value: 'amount', align:'end'},
 				{ text: 'Remarks', value: 'remark', align:'end' },
+				{ text: 'Amount', value: 'amount', align:'end'},
+				{ text: 'Date', value: 'date', align:'end' },
 				{ text: 'Controls', value: 'controls' },
 				// { text: 'Supplier', value: 'supplier' },
 				// { text: 'Invoice ID', value: 'invoiceId' },
@@ -188,7 +188,6 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllSuppliersData();
 				if(response && response.data) {
 					this.suppliers = response.data.suppliers
-		console.log(this.suppliers)
 				} // now suppliers is array which includes "name" + "id" from TABLE, "projects" (Array)
 			} catch (error) {
 				console.log(error);
@@ -270,7 +269,7 @@ export default {
 	margin: 12px;
 }
 .expanded-datatable{
-	width: 90%;
+	width: 100%;
     margin: 12px;
     border: 10px solid #98e983;
 	cursor: pointer;

@@ -26,7 +26,7 @@
                                 <v-text-field label="Budget" v-model="textField.budget" ></v-text-field>
                             </v-col>
                             <v-col cols="2">
-                                <v-btn @click="removeBudgetField(i)" class="error"><v-icon small >mdi-delete</v-icon></v-btn>
+                                <v-btn @click="removeBudgetField(i)" class="error" x-small><v-icon small >mdi-delete</v-icon></v-btn>
                             </v-col>
                         </v-row>
                     </div>                    

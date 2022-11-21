@@ -47,9 +47,8 @@ exports.savePaymentsBulk = async (req, res) => {
 exports.saveBooksBulk = async (req, res) => {
 
 	try {
-        await Promise.all([Book.deleteMany()]);
+        await Promise.all([Book.deleteMany({company: req.query.company, year: req.query.importYear})]);
 		let data = await csv().fromFile(`uploads/${req.file.filename}`);
-
         let books = [];
 
         data.forEach(item => {

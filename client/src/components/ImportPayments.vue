@@ -38,8 +38,7 @@
 						</v-col>
 					</v-row>
                 </div>
-
-				<v-card-text> Please select file to import </v-card-text>
+				<v-card-text> Year data will be overwritten </v-card-text>
 				<v-file-input @change="setFile"></v-file-input>
 				<v-divider></v-divider>
 
@@ -86,13 +85,24 @@ export default {
 			this.setImportModal(false);
 		},
 		setFile(file) {
-			this.file = file;
+			if (file.type === "text/csv")
+				this.file = file; else
+					console.log("file type MUST be csv")
 		},
 		async submitFile() {
 			try {
-				const response = (this.importData === "PAYMENTS")
-									? await SpecificServiceEndPoints.savePaymentsImport(this.file)
-									: await SpecificServiceEndPoints.saveBooksImport(this.file,this.company,this.importYear) ;
+				let response = '';
+				switch (this.importData){
+					case "PAYMENT" :
+						response = await SpecificServiceEndPoints.savePaymentsImport(this.file)
+						break
+					case "BOOKS" :
+						if (this.file.name.includes(this.company) && this.file.name.includes(this.importYear)) {
+							response = await SpecificServiceEndPoints.saveBooksImport(this.file,this.company,this.importYear) ;
+						} else console.log("company or year does not fits")
+						break
+					default : console.log("switch/case statment not resolved")
+				}
 				if (response.data && response.data.success) {
 					this.message = "Payments successfully imported";
 					setTimeout(() => {
