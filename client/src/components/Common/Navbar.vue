@@ -108,7 +108,9 @@ export default {
         },
         navigate(link) {
             if(link && link.route) {
-                this.$router.push({ path: link.route });
+                if (this.$router.history.current.fullPath != link.route) {
+                    this.$router.push({ path: link.route });
+                }
             } else {
                 link.onClick();
             }
