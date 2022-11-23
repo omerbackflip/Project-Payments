@@ -10,36 +10,21 @@
 					<v-row>
 						<v-col>
 							<v-radio-group v-model="company">
-								<v-radio
-									label="ביצועים"
-									value="ביצועים"
-								></v-radio>
-								<v-radio
-									label="יזמות"
-									value="יזמות"
-								></v-radio>
+								<v-radio label="ביצועים" value="ביצועים"></v-radio>
+								<v-radio label="יזמות" value="יזמות"></v-radio>
 							</v-radio-group>
 						</v-col>
 						<v-col>
 							<v-radio-group v-model="importYear">
-								<v-radio
-									label="2020"
-									value="2020"
-								></v-radio>
-								<v-radio
-									label="2021"
-									value="2021"
-								></v-radio>
-								<v-radio
-									label="2022"
-									value="2022"
-								></v-radio>
+								<v-radio label="2020" value="2020"></v-radio>
+								<v-radio label="2021" value="2021"></v-radio>
+								<v-radio label="2022" value="2022"></v-radio>
 							</v-radio-group>
 						</v-col>
 					</v-row>
                 </div>
 				<v-card-text> Year data will be overwritten </v-card-text>
-				<v-file-input @change="setFile"></v-file-input>
+				<v-file-input truncate-length="50" @change="setFile"></v-file-input>
 				<v-divider></v-divider>
 
 				<v-card-actions>
@@ -86,25 +71,26 @@ export default {
 		},
 		setFile(file) {
 			if (file.type === "text/csv")
-				this.file = file; else
-					console.log("file type MUST be csv")
+				this.file = file; 
+			else
+				alert("file type MUST be csv")
 		},
 		async submitFile() {
 			try {
 				let response = '';
 				switch (this.importData){
-					case "PAYMENT" :
+					case "PAYMENTS" :
 						response = await SpecificServiceEndPoints.savePaymentsImport(this.file)
 						break
 					case "BOOKS" :
 						if (this.file.name.includes(this.company) && this.file.name.includes(this.importYear)) {
 							response = await SpecificServiceEndPoints.saveBooksImport(this.file,this.company,this.importYear) ;
-						} else console.log("company or year does not fits")
+						} else alert("company or year does not fits")
 						break
-					default : console.log("switch/case statment not resolved")
+					default : alert("switch/case statment not resolved")
 				}
 				if (response.data && response.data.success) {
-					this.message = "Payments successfully imported";
+					this.message = "CSV Data successfully imported";
 					setTimeout(() => {
 						this.toggleDialog();
 					}, 3500);

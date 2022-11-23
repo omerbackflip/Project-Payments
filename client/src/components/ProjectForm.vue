@@ -135,7 +135,6 @@ export default {
                             budget: item.budget,
                         }})
                   };
-            // console.log(this.project)
             this.dialog = true;
             return new Promise((resolve) => {
                 this.resolve = resolve;

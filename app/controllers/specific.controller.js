@@ -123,6 +123,9 @@ exports.getMainViewProjectData = async (req, res) => {
                         supplier.payed = supplier.payments.reduce((payed, item) => {
                             return item.amount + payed
                         }, 0)
+                        // here need to fatch the supplier-budget from Project table
+                        // supplier.budget = await Project.findOne({name: project.name})
+                        supplier.budget = 555 
                     }));
                 }
             }))

@@ -43,7 +43,7 @@
         </v-navigation-drawer>
 
         <template v-if="openImportModal">
-            <ImportPayments :openImportModal="openImportModal" :setImportModal="toggleModal" :importData="importData"/>
+            <ImportCSV :openImportModal="openImportModal" :setImportModal="toggleModal" :importData="importData"/>
         </template>
         <template v-if="dialog">
             <Payment :onPaymentFormClose="onPaymentFormClose" :supplierList="supplierList" title="New Payment" :paymentToUpdate="null"/>
@@ -57,12 +57,12 @@
 import { PAYMENT_MODEL } from '../../constants/constants';
 import apiService from '../../services/apiService';
 import ConfirmDialog from './ConfirmDialog.vue';
-import ImportPayments from '../ImportPayments.vue';
+import ImportCSV from '../ImportCSV.vue';
 import Payment from '../PaymentForm.vue';
 import PaymentsList from '../PaymentsList.vue';
 
 export default {
-    components: { ImportPayments,Payment, PaymentsList, ConfirmDialog },
+    components: { ImportCSV,Payment, PaymentsList, ConfirmDialog },
     data() {
         return {
             drawer: false,

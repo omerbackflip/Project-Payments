@@ -147,7 +147,7 @@ export default {
 			],
 			supplierHeaders: [
 				{ text: 'Supplier', value: 'supplier' },
-				// { text: 'Budget', value: 'budget', align:'end' },
+				{ text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Payed', value: 'payed', align:'end' },
 			],
 			paymentsHeaders: [
@@ -170,6 +170,7 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllProjectsData();
 				if(response.data && response.data.success) {
 					this.projects = response.data.projects;
+					console.log(this.projects)
 				}
 			} catch (error) {
 				console.log(error);
