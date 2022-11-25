@@ -130,6 +130,12 @@ exports.getMainViewProjectData = async (req, res) => {
                 }
             }))
         }
+        projects = projects.map((item) => {
+            const total = item.suppliers.reduce((payed, item1) => {
+                return (item1.payed + payed)
+            }, 0)
+            return ({...item, payed: total})
+        })
         return res.send({success: true, projects});
     } catch (error) {
         console.log(error)
@@ -160,6 +166,12 @@ exports.getMainViewSupplierData = async (req, res) => {
                     }));
                 }
             }))
+            suppliers = suppliers.map((item) => {
+                const total = item.projects.reduce((payed, item1) => {
+                    return (item1.payed + payed)
+                }, 0)
+                return ({...item, payed: total})
+            })
             return res.send({success: true, suppliers});
         }
     } catch (error) {

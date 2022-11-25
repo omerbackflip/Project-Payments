@@ -45,6 +45,9 @@
 					<template v-slot:[`item.budget`]="{ item }">
 						{{item.budget.toLocaleString()}}
 					</template>
+					<template v-slot:[`item.payed`]="{ item }">
+						{{item.payed.toLocaleString()}}
+					</template>
 					<template v-slot:[`item.createdAt`]="{ item }">
 						<span>{{ new Date(item.createdAt).toLocaleString() }}</span>
 					</template>
@@ -139,10 +142,10 @@ export default {
 			showMessage: false,
 			message: '',
 			headers: [
-				{ text: 'Name', value: 'name', align:'end' },
-				{ text: 'Budget', value: 'budget', align:'end' },
-				// { text: 'Payed', value: 'total', align:'end' },
+				{ text: 'Payed', value: 'payed', align:'end' },
 				// { text: 'Date Created', value: 'createdAt' },
+				{ text: 'Budget', value: 'budget', align:'end' },
+				{ text: 'Name', value: 'name', align:'end' },
 				{ text: 'Controls', value: 'controls' },
 			],
 			supplierHeaders: [

@@ -50,6 +50,9 @@
 							<v-icon small>mdi-delete</v-icon>
 						</v-btn>
 					</template>
+					<template v-slot:[`item.payed`]="{ item }">
+						{{item.payed.toLocaleString()}}
+					</template>
 				</v-data-table>
 			</v-card>
 		</v-layout>
@@ -157,9 +160,9 @@ export default {
 			showMessage: false,
 			message: '',
 			headers: [
-				{ text: 'Payed', value: 'payed' },
-				{ text: 'Budget', value: 'totalBudget' },
-				{ text: 'Name', value: 'name' },
+				{ text: 'Payed', value: 'payed', align:'end' },
+				{ text: 'Budget', value: 'totalBudget', align:'end' },
+				{ text: 'Name', value: 'name', align:'end' },
 				{ text: 'Controls', value: 'controls' },
 			],
 			projectHeaders: [

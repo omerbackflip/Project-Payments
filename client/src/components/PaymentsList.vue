@@ -53,7 +53,7 @@
                     </v-list-item-title>
                     <v-list-item-subtitle class="blue--text">
                       {{ item.amount ? item.amount.toLocaleString() : "" }}
-                      {{ "("+ new Date(item.date).toLocaleDateString('he-EG') +")" }}
+                      {{ item.date ? "("+ new Date(item.date).toLocaleDateString('he-EG') +")" : "???"}}
                     </v-list-item-subtitle>
                     <v-list-item-subtitle>
                       {{ item.invoiceId ? "Inv: " + item.invoiceId : "" }}

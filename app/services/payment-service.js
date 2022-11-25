@@ -10,14 +10,15 @@ exports.getProjectsAndSuppliersAndPaymentsToSave = (data) => {
         let payments = [];
 
         data.forEach(item => {
+            let hebDate = (item.date).substring(3,5).concat('/').concat((item.date).substring(0,2)).concat('/').concat((item.date).substring(6,10))
             let payment = {
                 project: (item.project || ''),
                 budget: item.budget || 0,
-                amount: item.amount,
+                amount: item.amount.replace(",",""),
                 vat: item.vat,
                 paymentMethod: item.payMethod,
                 remark: item.remark,				
-                date: item.date ? new Date(item.date) : Date.now(),
+                date: !isNaN(new Date (hebDate)) ? new Date(hebDate) : null,
                 supplier: item.supplier,
                 clear: item.clear,
                 invoiceId: item.invoiceId,
