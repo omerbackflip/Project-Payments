@@ -17,11 +17,11 @@
 				>
 					<template v-slot:top>
 						<v-toolbar flat>
-							<v-toolbar-title>All Suppliers - {{suppliers.length}}</v-toolbar-title>
+							<v-toolbar-title>קבלנים - {{suppliers.length}}</v-toolbar-title>
 							<v-spacer></v-spacer>
-							<v-btn @click="dialog = true">
+							<v-btn @click="dialog = true" small>
 								<v-icon class="nav-icon" small >mdi-plus</v-icon>
-								NEW SUPPLIER
+								הוספת קבלן
 							</v-btn>
 						</v-toolbar>
 					</template>
@@ -38,6 +38,9 @@
 								class="expanded-datatable">
 								<template v-slot:[`item.payed`]="{ item }">
 									<span>{{ item.payed.toLocaleString()  }} </span>
+								</template>
+								<template v-slot:[`item.controls`]="{ item }">
+									<PaymentsDialog :payments="item.payments"/>
 								</template>
 							</v-data-table>
 						</td>
@@ -77,50 +80,7 @@
 			</v-card>
 		</v-dialog>
 		<confirm-dialog ref="confirm"/>
-
-			<!-- View payments of supplier -->
-		<v-dialog
-			v-model="projectPaymentsDialog"
-			class="payments-dialog"
-		>
-			<v-card>
-				<v-data-table
-				:headers="paymentsHeaders"
-				disable-pagination
-				hide-default-footer
-				fixed-header
-				height="75vh"
-				:items="selectedProject.payments"
-				mobile-breakpoint="0"
-				>
-					<template v-slot:top>
-						<v-toolbar flat>
-							<v-toolbar-title>תשלומים
-								{{selectedProject.payments[0].project}} - 
-								{{selectedProject.payments[0].supplier}} -
-								<!-- {{selectedSupplier.total.toLocaleString()}} -->
-							</v-toolbar-title>
-							<v-spacer></v-spacer>
-						</v-toolbar>
-					</template>
-					<template v-slot:[`item.date`]="{ item }">
-						<span>{{ new Date(item.date).toLocaleDateString('he-EG') }}</span>
-					</template>
-					<template v-slot:[`item.amount`]="{ item }">
-						{{item.amount.toLocaleString()}}
-					</template>
-					<template v-slot:[`item.controls`]="{ item }">
-						<v-btn @click="paymentToUpdate = item" x-small>
-							<v-icon small>mdi-pencil</v-icon>
-						</v-btn>
-                        <v-btn x-small @click="deletePayment(item._id)">
-                            <v-icon small >mdi-delete</v-icon>
-                        </v-btn>
-					</template>
-            </v-data-table>
-			</v-card>
-		</v-dialog>
-				<!-- -------------------- -->
+		
 		<template v-if="paymentToUpdate">
 			<Payment 
 				:onPaymentFormClose="onPaymentFormClose" 
@@ -141,10 +101,11 @@ import apiService from "../services/apiService";
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
 import ConfirmDialog from './Common/ConfirmDialog.vue';
 import Payment from "./PaymentForm.vue";
+import PaymentsDialog from './PaymentsDialog.vue'
 
 export default {
 	name: "supplier-list",
-	components: { ConfirmDialog,Payment },
+	components: { ConfirmDialog,Payment, PaymentsDialog },
 	data() {
 		return {
 			suppliers: [],
@@ -159,26 +120,16 @@ export default {
 			showMessage: false,
 			message: '',
 			headers: [
-				{ text: 'Payed', value: 'payed', align:'end' },
-				{ text: 'Budget', value: 'totalBudget', align:'end' },
-				{ text: 'Supplier', value: 'supplier', align:'end' },
-				{ text: 'Controls', value: 'controls' },
+				{ text: 'שולם', value: 'payed', align:'end' },
+				{ text: 'תקציב', value: 'totalBudget', align:'end' },
+				{ text: 'קבלן', value: 'supplier', align:'end' },
+				{ text: '', value: 'controls' },
 			],
 			projectHeaders: [
 				{ text: 'Payed', value: 'payed', align:'end' },
 				{ text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Project', value: 'project', align:'end'},
-			],
-			paymentsHeaders: [
-				// { text: 'Project', value: 'project' },
-				// { text: 'Vat', value: 'vat' },
-				// { text: 'Payment Method', value: 'paymentMethod' },
-				{ text: 'Remarks', value: 'remark', align:'end' },
-				{ text: 'Amount', value: 'amount', align:'end'},
-				{ text: 'Date', value: 'date', align:'end' },
-				{ text: 'Controls', value: 'controls' },
-				// { text: 'Supplier', value: 'supplier' },
-				// { text: 'Invoice ID', value: 'invoiceId' },
+				{ text: '', value: 'controls' },
 			],
 			expanded: [],
 		}

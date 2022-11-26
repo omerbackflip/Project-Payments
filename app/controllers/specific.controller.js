@@ -127,7 +127,6 @@ exports.getMainViewProjectData = async (req, res) => {
                         }, 0)
                         // fatch the supplier-budget from Project table
                         let proj = await Project.findOne({project: project.project})
-                        console.log(proj)
                         let supp = proj.suppliers.filter((item) => {
                             return (item.supplier === supplier.supplier )
                         })

@@ -69,12 +69,12 @@ export default {
             openImportModal: false,
             importData: [], // PaymentsCsvData or BooksCsvData
             links: [
-                {icon: 'mdi-briefcase-check', text: 'Project list', route: '/'},
-                {icon: 'mdi-account-multiple-check', text: 'Supplier list', route: '/supplier-list'},
-                {icon: 'mdi-cash-multiple', text: 'Payments', route: '/payments'},
-                {icon: 'mdi-arrow-up-bold-box-outline', text: 'Import payments', route: null , onClick: this.toggleModal},
-                {icon: 'mdi-arrow-up-bold-box-outline', text: 'Import books', route: null , onClick: this.toggleBook},
-                {icon: 'mdi-file-table-box-multiple', text: 'Table list', route: '/table-list'},
+                {icon: 'mdi-briefcase-check', text: 'פרויקטים', route: '/'},
+                {icon: 'mdi-account-multiple-check', text: 'קבלנים', route: '/supplier-list'},
+                {icon: 'mdi-cash-multiple', text: 'כל התשלומים', route: '/payments'},
+                {icon: 'mdi-arrow-up-bold-box-outline', text: 'ייבוא תשלומים', route: null , onClick: this.toggleModal},
+                {icon: 'mdi-arrow-up-bold-box-outline', text: 'יבוא הנהח-ש', route: null , onClick: this.toggleBook},
+                {icon: 'mdi-file-table-box-multiple', text: 'טבלאות', route: '/table-list'},
             ],
             supplierList : ['All'],
             selectedSupplier : "All",
