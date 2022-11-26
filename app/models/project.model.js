@@ -4,10 +4,10 @@ var mongoose = require('mongoose')
 module.exports = mongoose => {
 	const schema = mongoose.Schema(
 		{
-			name: String,
+			project: String,
 			budget: {type: Number, default: 0},
 			suppliers: [{
-				name: String,
+				supplier: String,
 				budget: {type: Number , default: 0},	
 			}],
 		},

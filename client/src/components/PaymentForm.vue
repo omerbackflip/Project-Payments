@@ -77,7 +77,6 @@
 </template>
 
 <script>
-// import { PAYMENT_MODEL, PROJECT_MODEL, SUPPLIER_MODEL, TABLE_MODEL } from '../constants/constants';
 import { PAYMENT_MODEL, TABLE_MODEL } from '../constants/constants';
 // import moment from 'moment';
 import apiService from "../services/apiService";
@@ -124,13 +123,6 @@ export default {
         },
         async getAllProjectsAndSuppliers() {
             try {
-                // const [projects,suppliers] = await Promise.all([
-                //     apiService.get({model: PROJECT_MODEL}),
-                //     apiService.get({model: SUPPLIER_MODEL}),
-                // ]);
-                // this.projects = projects.data.map(project => project.name);
-                // this.suppliers = suppliers.data.map(supplier => supplier.name);
-
                 const [projects,suppliers] = await Promise.all([
                     apiService.get({model: TABLE_MODEL , table_id : 2}), // get projects list from TABLE
                     apiService.get({model: TABLE_MODEL , table_id : 1}), // get suppliers list from TABLE

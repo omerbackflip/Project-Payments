@@ -158,9 +158,7 @@ export default {
         },
         async getSuppliersList() {
             try {
-                // const response = await apiService.get({ model: SUPPLIER_MODEL});
-                // this.suppliersList = response.data.map(supplier => supplier.name);
-                // console.log(this.suppliersList)
+
                 const response = await apiService.get({ model: TABLE_MODEL, table_id: 1});
                 this.suppliersList = response.data.map(supplier => supplier.description);
                 this.$emit("getData", null, null, this.suppliersList);

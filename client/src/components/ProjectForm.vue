@@ -12,7 +12,7 @@
             <div class="field-margin" v-show="showMessage">
                 {{message}}
             </div>
-            <v-text-field class="field-margin" v-model="project.name" label="Name"></v-text-field>
+            <v-text-field class="field-margin" v-model="project.project" label="Name"></v-text-field>
             <v-text-field class="field-margin" v-model="project.budget" label="Budget"></v-text-field>
             <div class="suppliers-wrapper">
                 <h3>Suppliers</h3>
@@ -20,7 +20,7 @@
                     <div v-for="(textField, i) in project.suppliers" :key="i" class="text-fields-row">
                         <v-row>
                             <v-col cols="4">
-                                <v-select class="mt-5" :items="currentSuppliers" v-model="textField.name" label="Supplier" dense></v-select>
+                                <v-select class="mt-5" :items="currentSuppliers" v-model="textField.supplier" label="Supplier" dense></v-select>
                             </v-col>
                             <v-col cols="4" sm="6">
                                 <v-text-field label="Budget" v-model="textField.budget" ></v-text-field>
@@ -39,7 +39,7 @@
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="dialog = false"> Close </v-btn>
-                <v-btn :disabled = "!project.name" color="primary" text @click="submitProject()"> Submit </v-btn>
+                <v-btn :disabled = "!project.project" color="primary" text @click="submitProject()"> Submit </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -47,7 +47,6 @@
 
 <script>
 import { PROJECT_MODEL, TABLE_MODEL } from "../constants/constants";
-// import { PROJECT_MODEL, SUPPLIER_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
 
@@ -57,7 +56,7 @@ export default {
         return {
             currentSuppliers: [],
             allSuppliers: [], // looks that this is not used
-            project: {name: '' , budget: '', suppliers: []},
+            project: {project: '' , budget: '', suppliers: []},
 			dialog: false,
             resolve: null,
 			showMessage: false,
@@ -75,9 +74,9 @@ export default {
 			try {
 				let response;
 				if(this.newProject) {
-					response = await apiService.create({name: this.project.name , budget: this.project.budget} , {model:PROJECT_MODEL});
+					response = await apiService.create({project: this.project.project , budget: this.project.budget} , {model:PROJECT_MODEL});
 				} else {
-					response = await apiService.update(this.project._id , { name: this.project.name , budget: this.project.budget } , {model:PROJECT_MODEL});
+					response = await apiService.update(this.project._id , { project: this.project.project , budget: this.project.budget } , {model:PROJECT_MODEL});
 				}
 
                 if(response.data && response.data.data) {
@@ -89,7 +88,7 @@ export default {
                                 return {
                                     // supplier: this.allSuppliers[ this.allSuppliers.findIndex(supplier => item.name === supplier.name) ]._id,
                                     // payments: item.payments,
-                                    name: item.name,
+                                    supplier: item.supplier,
                                     budget: item.budget
                                 };
                             })
@@ -109,8 +108,6 @@ export default {
 		},
 		async getAllProjectsAndSuppliers() {
             try {
-                // const suppliers = await apiService.get({model: SUPPLIER_MODEL});
-                // this.currentSuppliers = suppliers.data.map(supplier => supplier.name);
                 const suppliers = await apiService.get({model: TABLE_MODEL, table_id: 1});
                 this.currentSuppliers = suppliers.data.map(supplier => supplier.description);
                 this.allSuppliers = suppliers.data;
@@ -127,11 +124,11 @@ export default {
         open(project, newProject) {
             this.newProject = newProject;
             this.project = newProject 
-                ? {name: '' , budget: 0 , suppliers: []} 
+                ? {project: '' , budget: 0 , suppliers: []} 
                 : {...project,
                     suppliers: project.suppliers.map(item => {
                         return {
-                            name: item.supplier,
+                            supplier: item.supplier,
                             budget: item.budget,
                         }})
                   };

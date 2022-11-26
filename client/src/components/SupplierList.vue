@@ -11,13 +11,13 @@
 					:items="suppliers"
 					mobile-breakpoint="0"
 					:expanded.sync="expanded"
-					item-key="name"
+					item-key="supplier"
 					show-expand
 					single-expand
 				>
 					<template v-slot:top>
 						<v-toolbar flat>
-							<v-toolbar-title>All Suppliers</v-toolbar-title>
+							<v-toolbar-title>All Suppliers - {{suppliers.length}}</v-toolbar-title>
 							<v-spacer></v-spacer>
 							<v-btn @click="dialog = true">
 								<v-icon class="nav-icon" small >mdi-plus</v-icon>
@@ -57,23 +57,22 @@
 			</v-card>
 		</v-layout>
 
+		<!-- dialog for Update/New supplier -->
 		<v-dialog v-model="dialog" width="500">
 			<v-card>
 				<v-card-title class="text-h5 grey lighten-2">
-					{{supplier ? 'Update' : 'New'}} Supplier
+					{{supplier.supplier ? 'Update' : 'New'}} Supplier
 				</v-card-title>
 				<div class="field-margin" v-show="showMessage">
 					{{message}}
 				</div>
-				<v-text-field class="field-margin" v-model="supplier.name" label="Name"></v-text-field>
-				<!-- <v-text-field class="field-margin" v-model="supplier.budget" label="Budget"></v-text-field> -->
-
+				<v-text-field class="field-margin" v-model="supplier.supplier" label="Supplier Name"></v-text-field>
 				<v-divider></v-divider>
 
 				<v-card-actions>
 					<v-spacer></v-spacer>
 					<v-btn color="primary" text @click="onDialogSupplierClose()"> Close </v-btn>
-					<v-btn :disabled = "!supplier.name" color="primary" text @click="submitSupplier()"> Submit </v-btn>
+					<v-btn :disabled = "!supplier" color="primary" text @click="submitSupplier()"> Submit </v-btn>
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
@@ -90,7 +89,7 @@
 				disable-pagination
 				hide-default-footer
 				fixed-header
-					height="75vh"
+				height="75vh"
 				:items="selectedProject.payments"
 				mobile-breakpoint="0"
 				>
@@ -150,8 +149,8 @@ export default {
 		return {
 			suppliers: [],
 			supplier: {
-				budget: '',
-				name: '',
+				supplier: '',
+				id: '',	// if there is supplier.id --> means "update"
 			},
 			paymentToUpdate: null,
 			dialog: false,
@@ -162,7 +161,7 @@ export default {
 			headers: [
 				{ text: 'Payed', value: 'payed', align:'end' },
 				{ text: 'Budget', value: 'totalBudget', align:'end' },
-				{ text: 'Name', value: 'name', align:'end' },
+				{ text: 'Supplier', value: 'supplier', align:'end' },
 				{ text: 'Controls', value: 'controls' },
 			],
 			projectHeaders: [
@@ -191,7 +190,8 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllSuppliersData();
 				if(response && response.data) {
 					this.suppliers = response.data.suppliers
-				} // now suppliers is array which includes "name" + "id" from TABLE, "projects" (Array)
+				} 	// now suppliers is array which includes "supplier" + "id" from TABLE + "projects" (Array)
+					// reason for the "id" is to be able to destinguish between "create" or "update"
 			} catch (error) {
 				console.log(error);
 			}
@@ -211,7 +211,7 @@ export default {
 			this.projectPaymentsDialog = true;
 		},
 		updateSupplier(item) {
-			this.supplier = {id: item.id, name: item.name};
+			this.supplier = {id: item.id, supplier: item.supplier};
 			this.dialog = true;
 		},
 		async deleteSupplier(supplier) {
@@ -231,16 +231,16 @@ export default {
             this.paymentToUpdate = null;
         },
 		onDialogSupplierClose() {
-			this.supplier = '';
+			this.supplier.supplier = '';
+			this.supplier.id = '';
 			this.dialog = false;
         },
 		async submitSupplier() {
 			try {
 				let response;
-				let thisSupp = {description: this.supplier.name, table_id: 1};
+				let thisSupp = {description: this.supplier.supplier, table_id: 1};
 				if(this.supplier.id) { // if there is supplier.id --> means "update" 
-					let id = this.supplier.id;
-					response = await apiService.update(id, thisSupp, {model:TABLE_MODEL});
+					response = await apiService.update(this.supplier.id, thisSupp, {model:TABLE_MODEL});
 					// need to add update supplier to relevant PAYMENTS
 				} else {	// if there is NO supplier.id --> means "create"
 					response = await apiService.create(thisSupp, {model:TABLE_MODEL});
@@ -249,11 +249,12 @@ export default {
 					this.message = 'Supplier successfully created/updated!';
 					this.showMessage = true;
 					this.getSuppliers();
-					this.supplier = '';
+					this.supplier.supplier = '';
+					this.supplier.id = '';
 					setTimeout(() => {
 						this.dialog = false;
 						this.showMessage = false;
-					}, 3000);
+					}, 1000);
 				}
 			} catch (error) {
 				console.log(error);

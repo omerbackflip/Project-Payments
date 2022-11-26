@@ -41,17 +41,18 @@ exports.getProjectsToSave = (suppliers,payments) => {
         payments.map(async payment => {
 
             supplierName = suppliers[suppliers.findIndex(supplier => supplier.description === payment.supplier)].description;
-            projectIndex = projects.findIndex(project => project.name === payment.project);
+            projectIndex = projects.findIndex(project => project.project === payment.project);
 
             if(projectIndex >= 0) {
-                supplierIndex = projects[projectIndex].suppliers.findIndex(supplier => supplier.name === supplierName);
+                supplierIndex = projects[projectIndex].suppliers.findIndex(supplier => supplier.supplier === supplierName);
                 if(supplierIndex >= 0) return;
-                projects[projectIndex].suppliers.push({ name: supplierName });
+                projects[projectIndex].suppliers.push({ supplier: supplierName });
                 return;
             }    
-            projects.push({ name: payment.project, suppliers: [{ name: supplierName}] });
+            projects.push({ project: payment.project, suppliers: [{ supplier: supplierName}] });
         });
     }
+    // console.log(projects)
     return projects;
 }
 

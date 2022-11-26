@@ -15,7 +15,7 @@ const { query } = require("express");
 exports.savePaymentsBulk = async (req, res) => {
 
 	try {
-        await Promise.all([Project.deleteMany(), Supplier.deleteMany(), Payment.deleteMany(), Table.deleteMany()]);
+        await Promise.all([Project.deleteMany(), Payment.deleteMany(), Table.deleteMany()]);
 		let data = await csv().fromFile(`uploads/${req.file.filename}`);
         const {projects1, suppliers , payments} = paymentService.getProjectsAndSuppliersAndPaymentsToSave(data);
         let suppList = [...suppliers];
@@ -113,19 +113,25 @@ exports.getMainViewProjectData = async (req, res) => {
         let projects = await Project.find().lean();
         if(projects && projects.length) {
             await Promise.all(projects.map(async project => {
-                project.suppliers = await Payment.find({"project" : project.name}, 'supplier').lean();
+                project.suppliers = await Payment.find({"project" : project.project}, 'supplier').lean();
+                // filter to get unique supplier list
                 project.suppliers = project.suppliers.filter((value, index, self) =>
                     index === self.findIndex((t) => ( t.supplier === value.supplier))
                 )
+                // build the suppliers array
                 if(project.suppliers && project.suppliers.length) {
                     await Promise.all(project.suppliers.map(async supplier=> {
-                        supplier.payments = await Payment.find({supplier: supplier.supplier , project: project.name}).lean();
+                        supplier.payments = await Payment.find({supplier: supplier.supplier , project: project.project}).lean();
                         supplier.payed = supplier.payments.reduce((payed, item) => {
                             return item.amount + payed
                         }, 0)
-                        // here need to fatch the supplier-budget from Project table
-                        // supplier.budget = await Project.findOne({name: project.name})
-                        supplier.budget = 555 
+                        // fatch the supplier-budget from Project table
+                        let proj = await Project.findOne({project: project.project})
+                        console.log(proj)
+                        let supp = proj.suppliers.filter((item) => {
+                            return (item.supplier === supplier.supplier )
+                        })
+                        supplier.budget = supp[0].budget
                     }));
                 }
             }))
@@ -149,17 +155,17 @@ exports.getMainViewSupplierData = async (req, res) => {
         // let suppliers = await Supplier.find().lean();
         let suppliers = await Table.find({table_id : '1' }).lean();
         suppliers = suppliers.map((item) => {
-            return ({id: item._id , name : item.description}) // "id" is needed for later use (e.g for delete or update)
+            return ({id: item._id , supplier : item.description}) // "id" is needed for later use (e.g for delete or update)
         })
         if(suppliers && suppliers.length) {
             await Promise.all(suppliers.map(async supplier => {
-                supplier.projects = await Payment.find({"supplier" : supplier.name}, 'project').lean();
+                supplier.projects = await Payment.find({"supplier" : supplier.supplier}, 'project').lean();
                 supplier.projects = supplier.projects.filter((value, index, self) =>
                     index === self.findIndex((t) => ( t.project === value.project))
                 )
                 if(supplier.projects && supplier.projects.length) {
                     await Promise.all(supplier.projects.map(async project=> {
-                        project.payments = await Payment.find({supplier: supplier.name, project: project.project}).lean();
+                        project.payments = await Payment.find({supplier: supplier.supplier, project: project.project}).lean();
                         project.payed = project.payments.reduce((payed, item) => {
                             return item.amount + payed
                         }, 0)
@@ -186,7 +192,7 @@ exports.addSupplierBudgetsToProject = async(req,res) => {
         const supplierBudgets = req.body.map(item => {
             return {
                 // supplier: mongoose.Types.ObjectId(item.supplier),
-                name: item.name,
+                supplier: item.supplier,
                 budget: item.budget,
                 // payments: item.payments
             }

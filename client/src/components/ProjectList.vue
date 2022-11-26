@@ -10,14 +10,14 @@
 					height="75vh"
 					:items="projects"
 					:expanded.sync="expanded"
-					item-key="name"
+					item-key="project"
 					show-expand
 					single-expand
 					mobile-breakpoint="0"
 				>
 					<template v-slot:top>
 						<v-toolbar flat>
-							<v-toolbar-title>All Projects</v-toolbar-title>
+							<v-toolbar-title>All Projects - {{projects.length}}</v-toolbar-title>
 							<v-spacer></v-spacer>
 							<v-btn @click="updateProject()">
 								<v-icon class="nav-icon" small >mdi-plus</v-icon>
@@ -145,7 +145,7 @@ export default {
 				{ text: 'Payed', value: 'payed', align:'end' },
 				// { text: 'Date Created', value: 'createdAt' },
 				{ text: 'Budget', value: 'budget', align:'end' },
-				{ text: 'Name', value: 'name', align:'end' },
+				{ text: 'Project', value: 'project', align:'end' },
 				{ text: 'Controls', value: 'controls' },
 			],
 			supplierHeaders: [
@@ -173,6 +173,7 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllProjectsData();
 				if(response.data && response.data.success) {
 					this.projects = response.data.projects;
+					// console.log(this.projects)
 				}
 			} catch (error) {
 				console.log(error);
