@@ -80,14 +80,6 @@
 			</v-card>
 		</v-dialog>
 		<confirm-dialog ref="confirm"/>
-		
-		<template v-if="paymentToUpdate">
-			<Payment 
-				:onPaymentFormClose="onPaymentFormClose" 
-				title="Update Payment" 
-				:paymentToUpdate="paymentToUpdate" 
-			/>
-		</template>
 	</div>
 
 	
@@ -100,12 +92,11 @@ import { PAYMENT_MODEL, TABLE_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
 import ConfirmDialog from './Common/ConfirmDialog.vue';
-import Payment from "./PaymentForm.vue";
 import PaymentsDialog from './PaymentsDialog.vue'
 
 export default {
 	name: "supplier-list",
-	components: { ConfirmDialog,Payment, PaymentsDialog },
+	components: { ConfirmDialog, PaymentsDialog },
 	data() {
 		return {
 			suppliers: [],

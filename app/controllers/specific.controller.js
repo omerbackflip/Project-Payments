@@ -23,14 +23,14 @@ exports.savePaymentsBulk = async (req, res) => {
         suppList = suppList.map((item) =>{
             return ( { 'table_id' : '1' , 'description' : item.name})
         });
-        projList = projList.map((item) =>{
-            return ( { 'table_id' : '2' , 'description' : item.name})
-        });
+        // projList = projList.map((item) =>{
+        //     return ( { 'table_id' : '2' , 'description' : item.name})
+        // });
         const [savedSuppliers , savedPayments] = await Promise.all([
             dbService.insertMany(Table,suppList),
             // dbService.insertMany(Supplier,suppliers),
             dbService.insertMany(Payment,payments),
-            dbService.insertMany(Table,projList),
+            // dbService.insertMany(Table,projList),
         ]);
 
         const projects = paymentService.getProjectsToSave(savedSuppliers , savedPayments);

@@ -66,14 +66,6 @@
 			</v-card>
 		</v-layout>
 
-		<template v-if="paymentToUpdate">
-			<Payment 
-				:onPaymentFormClose="onPaymentFormClose" 
-				title="Update Payment" 
-				:paymentToUpdate="paymentToUpdate" 
-			/>
-		</template>
-		<confirm-dialog ref="confirm"/>
 		<project-form ref="projectForm"/>
 	</div>
 </template>
@@ -81,17 +73,15 @@
 
 
 <script>
-import { PAYMENT_MODEL, PROJECT_MODEL } from "../constants/constants";
+import { PROJECT_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
-import ConfirmDialog from './Common/ConfirmDialog.vue';
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
-import Payment from "./PaymentForm.vue";
 import ProjectForm from './ProjectForm.vue';
 import PaymentsDialog from './PaymentsDialog.vue'
 
 export default {
 	name: "project-list",
-	components: { ConfirmDialog, Payment, ProjectForm, PaymentsDialog },
+	components: { ProjectForm, PaymentsDialog },
 	data() {
 		return {
 			projects: [],
@@ -122,7 +112,6 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllProjectsData();
 				if(response.data && response.data.success) {
 					this.projects = response.data.projects;
-					// console.log(this.projects)
 				}
 			} catch (error) {
 				console.log(error);
@@ -139,7 +128,6 @@ export default {
 			try {
 				if(id) {
 					if(await this.$refs.confirm.open( "Confirm", "Are you sure to delete this project? This will also delete all related payments")){
-						// await specificServiceEndPoints.deleteProjectAndCorrespondingData(id);
 						let params = {model:PROJECT_MODEL, id:id}
 						await apiService.deleteOne(params)
 						this.getProjects();
@@ -150,25 +138,11 @@ export default {
 			}
 		},
 
-		onSupplierSelect(supplier) {
+		onSupplierSelect(supplier) {  // this fumction is NOT used
 			this.selectedSupplier = supplier;
 			this.supplierPaymentsDialog = true;
 		},
 
-		async deletePayment(id) {
-            try {
-                if (await this.$refs.confirm.open( "Confirm", "Are you sure you want to delete this item?")) {
-                    await apiService.deleteOne({ model: PAYMENT_MODEL , id});
-					window.location.reload();
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        },
-
-		onPaymentFormClose() {
-            this.paymentToUpdate = null;
-        }
 	},
 
 	mounted() {
@@ -184,7 +158,7 @@ export default {
 }
 
 .expanded-datatable{
-	width: 90%;
+	width: 100%;
     margin: 12px;
     border: 10px solid #98e983;
 	cursor: pointer;

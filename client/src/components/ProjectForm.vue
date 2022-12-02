@@ -17,13 +17,13 @@
             <div class="suppliers-wrapper">
                 <h3>Suppliers</h3>
                 <v-container>
-                    <div v-for="(textField, i) in project.suppliers" :key="i" class="text-fields-row">
+                    <div v-for="(suppName, i) in project.suppliers" :key="i" class="text-fields-row">
                         <v-row>
                             <v-col cols="4">
-                                <v-select class="mt-5" :items="currentSuppliers" v-model="textField.supplier" label="Supplier" dense></v-select>
+                                <v-select class="mt-5" :items="allSuppliersName" v-model="suppName.supplier" label="Supplier" dense></v-select>
                             </v-col>
                             <v-col cols="4" sm="6">
-                                <v-text-field label="Budget" v-model="textField.budget" ></v-text-field>
+                                <v-text-field label="Budget" v-model="suppName.budget" ></v-text-field>
                             </v-col>
                             <v-col cols="2">
                                 <v-btn @click="removeBudgetField(i)" class="error" x-small><v-icon small >mdi-delete</v-icon></v-btn>
@@ -54,11 +54,11 @@ export default {
     name: "project-form",
     data() {
         return {
-            currentSuppliers: [],
-            allSuppliers: [], // looks that this is not used
+            allSuppliersName: [],
+            allSuppliersData: [], // looks that this is not used
             project: {project: '' , budget: '', suppliers: []},
 			dialog: false,
-            resolve: null,
+            resolve: null,      // What is this for ?
 			showMessage: false,
             newProject: false,
 			message: '',
@@ -86,7 +86,7 @@ export default {
                             response.data.data._id, 
                             this.project.suppliers.map(item => {
                                 return {
-                                    // supplier: this.allSuppliers[ this.allSuppliers.findIndex(supplier => item.name === supplier.name) ]._id,
+                                    // supplier: this.allSuppliersData[ this.allSuppliersData.findIndex(supplier => item.name === supplier.name) ]._id,
                                     // payments: item.payments,
                                     supplier: item.supplier,
                                     budget: item.budget
@@ -109,8 +109,8 @@ export default {
 		async getAllProjectsAndSuppliers() {
             try {
                 const suppliers = await apiService.get({model: TABLE_MODEL, table_id: 1});
-                this.currentSuppliers = suppliers.data.map(supplier => supplier.description);
-                this.allSuppliers = suppliers.data;
+                this.allSuppliersName = suppliers.data.map(supplier => supplier.description);
+                this.allSuppliersData = suppliers.data;
             } catch (error) {
                 console.log(error);
             }

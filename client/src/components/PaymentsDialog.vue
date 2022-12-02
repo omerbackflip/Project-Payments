@@ -41,13 +41,27 @@
             </v-data-table>
 			<v-btn small @click="paymentsDialog = false">close</v-btn>
         </v-card>
+
+        <template v-if="paymentToUpdate">
+			<Payment 
+				:onPaymentFormClose="onPaymentFormClose" 
+				title="Update Payment" 
+				:paymentToUpdate="paymentToUpdate" 
+			/>
+		</template>
+		<confirm-dialog ref="confirm"/>
     </v-dialog>
 
 </template>
 
 <script>
+import { PAYMENT_MODEL } from "../constants/constants";
+import apiService from "../services/apiService";
+import ConfirmDialog from './Common/ConfirmDialog.vue';
+import Payment from "./PaymentForm.vue";
 export default {
     props: ['payments'],
+	components: { ConfirmDialog, Payment    },
     data(){
         return {
             paymentsHeaders: [
@@ -62,8 +76,27 @@ export default {
                 // { text: 'Invoice ID', value: 'invoiceId' },
 			],
             paymentsDialog: false,
+			paymentToUpdate: null,
         }
+    },
+
+    methods: {
+        async deletePayment(id) {
+            try {
+                if (await this.$refs.confirm.open( "Confirm", "Are you sure you want to delete this item?")) {
+                    await apiService.deleteOne({ model: PAYMENT_MODEL , id});
+					window.location.reload();
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        onPaymentFormClose() {
+            this.paymentToUpdate = null;
+        },
+    },
+    async mounted() {
+        console.log(this.payments)
     }
-    
 }
 </script>
