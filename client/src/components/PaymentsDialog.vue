@@ -96,7 +96,7 @@ export default {
         },
     },
     async mounted() {
-        console.log(this.payments)
+        // console.log(this.payments)
     }
 }
 </script>

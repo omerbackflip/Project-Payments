@@ -130,7 +130,7 @@ exports.getMainViewProjectData = async (req, res) => {
                         let supp = proj.suppliers.filter((item) => {
                             return (item.supplier === supplier.supplier )
                         })
-                        supplier.budget = supp[0].budget
+                        supplier.budget = supp[0].budget ? supp[0].budget : 0;
                     }));
                 }
             }))

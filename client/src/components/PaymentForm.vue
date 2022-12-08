@@ -2,7 +2,7 @@
     <v-dialog v-model="dialog" max-width="600px">
         <v-card>
             <v-card-title>
-                <h2>{{title}} {{!paymentToUpdate ? ' - New Payment' : ''}}</h2>
+                <h2>{{title}} {{copyMode ? ' - Copy Mode' : ''}}</h2>
             </v-card-title>
             <v-card-text>
                 <v-container>
@@ -70,7 +70,7 @@
                 <v-spacer></v-spacer>
                 <v-btn color="primary" small @click="dialog=false">close</v-btn>
                 <v-btn color="primary" small @click="savePayment()">Save</v-btn>
-                <v-btn color="primary" small @click="copyPayment()" v-show="paymentToUpdate">Copy</v-btn>
+                <v-btn color="primary" small @click="copyPayment()" v-show="!copyMode">Copy</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -101,18 +101,15 @@ export default {
         suppliers: [],
         dialog: false,
         dateModal : false,
-        disabled: false,
+        copyMode: false,
       }
     },
     methods: {
         async savePayment() {
             try {
-                if (this.paymentToUpdate) {
-                    // console.log(this.payment)
+                if (this.payment._id) {
                     apiService.update(this.payment._id, this.payment, {model: PAYMENT_MODEL });
                 } else {
-                    // Dont need this since changes in Project table
-                    // apiService.create(this.payment , {model: PAYMENT_MODEL , middleware: 'addPaymentToSupplierMiddleWare'});
                     apiService.create(this.payment , {model: PAYMENT_MODEL});
                 }
                 window.location.reload();
@@ -134,9 +131,8 @@ export default {
             }
         },
         copyPayment(){
-            this.paymentToUpdate = null;
             delete this.payment._id ;
-            this.disabled = true
+            this.copyMode = true
         }
     },
 
