@@ -86,8 +86,6 @@ export default {
                             response.data.data._id, 
                             this.project.suppliers.map(item => {
                                 return {
-                                    // supplier: this.allSuppliersData[ this.allSuppliersData.findIndex(supplier => item.name === supplier.name) ]._id,
-                                    // payments: item.payments,
                                     supplier: item.supplier,
                                     budget: item.budget
                                 };

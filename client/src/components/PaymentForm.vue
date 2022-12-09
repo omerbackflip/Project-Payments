@@ -7,6 +7,14 @@
             <v-card-text>
                 <v-container>
                     <v-row>
+                        <v-col cols="4">
+                            <v-select class="mt-6"
+                                :items="projects"
+                                v-model="payment.project"
+                                label="Project"
+                                dense
+                            ></v-select>
+                        </v-col>
                         <v-col cols="4" sm="6" md="4">
                             <v-text-field v-model="payment.amount" label="Amount"></v-text-field>
                         </v-col>
@@ -46,14 +54,6 @@
                             <v-text-field v-model="payment.invoiceId" label="Invoice"></v-text-field>
                         </v-col>
                         <v-col cols="4">
-                            <v-select class="mt-6"
-                                :items="projects"
-                                v-model="payment.project"
-                                label="Project"
-                                dense
-                            ></v-select>
-                        </v-col>
-                        <v-col cols="4">
                             <v-text-field v-model="payment.paymentMethod" label="credit"></v-text-field>
                         </v-col>
                         <v-col cols="4">
@@ -80,6 +80,8 @@
 import { PAYMENT_MODEL, TABLE_MODEL, PROJECT_MODEL } from '../constants/constants';
 // import moment from 'moment';
 import apiService from "../services/apiService";
+import specificServiceEndPoints from '../services/specificServiceEndPoints';
+
 export default {
     name: "Payment",
     props:['title','paymentToUpdate','supplierList','onPaymentFormClose'],
@@ -111,6 +113,18 @@ export default {
                     apiService.update(this.payment._id, this.payment, {model: PAYMENT_MODEL });
                 } else {
                     apiService.create(this.payment , {model: PAYMENT_MODEL});
+                }
+                // in case of new supplier in this project - needs to add supplier to PROJECT table
+                const currProj = await apiService.get({model: PROJECT_MODEL, project: this.payment.project})
+                const findSupp = currProj.data[0].suppliers.find((item) =>{
+                    return item.supplier === this.payment.supplier
+                })
+                if(!findSupp) { // Add this supplier to PROJECT table
+                    console.log(currProj.data[0]._id)
+                    await specificServiceEndPoints.addProjectBudgetsToSupplier(
+                        currProj.data[0]._id, 
+                        [...currProj.data[0].suppliers, {supplier: this.payment.supplier, budget: 0}]
+                    );
                 }
                 window.location.reload();
                 this.dialog = false;   

@@ -127,10 +127,12 @@ exports.getMainViewProjectData = async (req, res) => {
                         }, 0)
                         // fatch the supplier-budget from Project table
                         let proj = await Project.findOne({project: project.project})
+
+                        // Need to make it effcient - now takes multiple duplicate supplires based on the payments...
                         let supp = proj.suppliers.filter((item) => {
                             return (item.supplier === supplier.supplier )
                         })
-                        supplier.budget = supp[0].budget ? supp[0].budget : 0;
+                        supplier.budget = supp != [] ? supp[0].budget : 0;
                     }));
                 }
             }))
