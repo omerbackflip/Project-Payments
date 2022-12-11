@@ -1,19 +1,12 @@
-<template >    
-    <v-dialog
-        v-model="paymentsDialog"
-        class="payments-dialog"
-    >
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" v-on="on" x-small>פירוט</v-btn>
-        </template>
-        <v-card>
+<template>
+    <v-dialog v-model="showPaymentsDialog"  @click:outside="closeDialog">
+        <v-card >
 				<v-data-table
 				:headers="paymentsHeaders"
+				:items="payments"
 				disable-pagination
 				hide-default-footer
 				fixed-header
-				height="55vh"
-				:items="payments"
 				mobile-breakpoint="0"
 				>
 					<template v-slot:top>
@@ -39,7 +32,7 @@
                         </v-btn>
 					</template>
             </v-data-table>
-			<v-btn small @click="paymentsDialog = false">close</v-btn>
+			<v-btn small @click="closeDialog()">close</v-btn>
         </v-card>
 
         <template v-if="paymentToUpdate">
@@ -51,7 +44,6 @@
 		</template>
 		<confirm-dialog ref="confirm"/>
     </v-dialog>
-
 </template>
 
 <script>
@@ -59,24 +51,20 @@ import { PAYMENT_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import ConfirmDialog from './Common/ConfirmDialog.vue';
 import Payment from "./PaymentForm.vue";
+
 export default {
-    props: ['payments'],
-	components: { ConfirmDialog, Payment    },
+    props: ['payments', 'showPaymentsDialog'],
+	components: { ConfirmDialog, Payment },
     data(){
         return {
             paymentsHeaders: [
-                // { text: 'Project', value: 'project' },
-                // { text: 'Vat', value: 'vat' },
-                // { text: 'Payment Method', value: 'paymentMethod' },
                 { text: 'Date', value: 'date' },
                 { text: 'Amount', value: 'amount', align:'end'},
                 { text: 'Remarks', value: 'remark', align:'end' },
                 { text: 'Controls', value: 'controls' },
-                // { text: 'Supplier', value: 'supplier' },
-                // { text: 'Invoice ID', value: 'invoiceId' },
 			],
-            paymentsDialog: false,
 			paymentToUpdate: null,
+            dialogOpen: false
         }
     },
 
@@ -94,9 +82,11 @@ export default {
         onPaymentFormClose() {
             this.paymentToUpdate = null;
         },
+        closeDialog() {
+            this.$emit('close')
+        }
     },
     async mounted() {
-        // console.log(this.payments)
-    }
+    },
 }
 </script>

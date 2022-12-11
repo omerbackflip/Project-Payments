@@ -39,9 +39,9 @@
 								<template v-slot:[`item.payed`]="{ item }">
 									{{item.payed.toLocaleString() || 0 }}
 								</template>
-								<template v-slot:[`item.controls`]="{ item }">
+								<!-- <template v-slot:[`item.controls`]="{ item }">
 									<PaymentsDialog :payments="item.payments"/>
-								</template>
+								</template> -->
 							</v-data-table>
 						</td>
 					</template>
@@ -65,8 +65,10 @@
 				</v-data-table>
 			</v-card>
 		</v-layout>
-
 		<project-form ref="projectForm"/>
+		<div>
+			<PaymentsDialog :payments="supplierPayments" :showPaymentsDialog="showPaymentsDialog" @close="onClosePaymentDialog"/>
+		</div>
 	</div>
 </template>
 
@@ -87,8 +89,8 @@ export default {
 			projects: [],
 			expanded: [],
 			paymentToUpdate: null,
-			selectedSupplier: {},
-			supplierPaymentsDialog: false,
+			supplierPayments: {},
+			showPaymentsDialog: false,
 			showMessage: false,
 			message: '',
 			headers: [
@@ -101,7 +103,7 @@ export default {
 				{ text: 'Supplier', value: 'supplier' },
 				{ text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Payed', value: 'payed', align:'end' },
-				{ text: '', value: 'controls' },
+				// { text: '', value: 'controls' },
 			],
 		}
 	},
@@ -138,10 +140,14 @@ export default {
 			}
 		},
 
-		onSupplierSelect(supplier) {  // this fumction is NOT used
-			this.selectedSupplier = supplier;
-			this.supplierPaymentsDialog = true;
+		onSupplierSelect(supplier) {
+			this.supplierPayments = supplier.payments;
+			this.showPaymentsDialog = true;
 		},
+
+		onClosePaymentDialog() {
+			this.showPaymentsDialog = false;
+		}
 
 	},
 

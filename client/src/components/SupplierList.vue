@@ -39,9 +39,9 @@
 								<template v-slot:[`item.payed`]="{ item }">
 									<span>{{ item.payed.toLocaleString()  }} </span>
 								</template>
-								<template v-slot:[`item.controls`]="{ item }">
+								<!-- <template v-slot:[`item.controls`]="{ item }">
 									<PaymentsDialog :payments="item.payments"/>
-								</template>
+								</template> -->
 							</v-data-table>
 						</td>
 					</template>	
@@ -80,6 +80,9 @@
 			</v-card>
 		</v-dialog>
 		<confirm-dialog ref="confirm"/>
+		<div>
+			<PaymentsDialog :payments="projectPayments" :showPaymentsDialog="showPaymentsDialog" @close="onClosePaymentDialog"/>
+		</div>
 	</div>
 
 	
@@ -106,8 +109,9 @@ export default {
 			},
 			paymentToUpdate: null,
 			dialog: false,
-			projectPaymentsDialog: false,
+			showPaymentsDialog: false,
 			selectedProject: {},
+			projectPayments: {},
 			showMessage: false,
 			message: '',
 			headers: [
@@ -120,7 +124,7 @@ export default {
 				{ text: 'Payed', value: 'payed', align:'end' },
 				{ text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Project', value: 'project', align:'end'},
-				{ text: '', value: 'controls' },
+				// { text: '', value: 'controls' },
 			],
 			expanded: [],
 		}
@@ -150,7 +154,8 @@ export default {
         },
 		onProjectSelect(project) {
 			this.selectedProject = project;
-			this.projectPaymentsDialog = true;
+			this.projectPayments = project.payments;
+			this.showPaymentsDialog = true;
 		},
 		updateSupplier(item) {
 			this.supplier = {id: item.id, supplier: item.supplier};
@@ -201,6 +206,9 @@ export default {
 			} catch (error) {
 				console.log(error);
 			}
+		},
+		onClosePaymentDialog() {
+			this.showPaymentsDialog = false;
 		}
 	},
 	mounted() {
