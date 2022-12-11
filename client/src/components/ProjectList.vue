@@ -95,13 +95,13 @@ export default {
 			message: '',
 			headers: [
 				{ text: 'הוצאות', value: 'payed', align:'end' },
-				{ text: 'הכנסות', value: 'budget', align:'end' },
+				// { text: 'הכנסות', value: 'budget', align:'end' },
 				{ text: 'פרויקט', value: 'project', align:'end' },
 				{ text: '', value: 'controls' },
 			],
 			supplierHeaders: [
 				{ text: 'Supplier', value: 'supplier' },
-				{ text: 'Budget', value: 'budget', align:'end' },
+				// { text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Payed', value: 'payed', align:'end' },
 				// { text: '', value: 'controls' },
 			],

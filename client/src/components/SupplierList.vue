@@ -116,13 +116,13 @@ export default {
 			message: '',
 			headers: [
 				{ text: 'שולם', value: 'payed', align:'end' },
-				{ text: 'תקציב', value: 'totalBudget', align:'end' },
+				// { text: 'תקציב', value: 'totalBudget', align:'end' },
 				{ text: 'קבלן', value: 'supplier', align:'end' },
 				{ text: '', value: 'controls' },
 			],
 			projectHeaders: [
 				{ text: 'Payed', value: 'payed', align:'end' },
-				{ text: 'Budget', value: 'budget', align:'end' },
+				// { text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Project', value: 'project', align:'end'},
 				// { text: '', value: 'controls' },
 			],
