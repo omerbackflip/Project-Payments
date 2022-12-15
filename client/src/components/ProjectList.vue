@@ -66,6 +66,7 @@
 			</v-card>
 		</v-layout>
 		<project-form ref="projectForm"/>
+		<confirm-dialog ref="confirm"/>
 		<div>
 			<PaymentsDialog :payments="supplierPayments" :showPaymentsDialog="showPaymentsDialog" @close="onClosePaymentDialog"/>
 		</div>
@@ -79,11 +80,12 @@ import { PROJECT_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
 import specificServiceEndPoints from '../services/specificServiceEndPoints';
 import ProjectForm from './ProjectForm.vue';
+import ConfirmDialog from './Common/ConfirmDialog.vue';
 import PaymentsDialog from './PaymentsDialog.vue'
 
 export default {
 	name: "project-list",
-	components: { ProjectForm, PaymentsDialog },
+	components: { ProjectForm, ConfirmDialog, PaymentsDialog },
 	data() {
 		return {
 			projects: [],
@@ -129,7 +131,7 @@ export default {
 		async deleteProject(id) {
 			try {
 				if(id) {
-					if(await this.$refs.confirm.open( "Confirm", "Are you sure to delete this project? This will also delete all related payments")){
+					if(await this.$refs.confirm.open( "Confirm", "Are you sure to delete this project?")){
 						let params = {model:PROJECT_MODEL, id:id}
 						await apiService.deleteOne(params)
 						this.getProjects();
