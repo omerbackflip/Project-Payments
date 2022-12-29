@@ -113,6 +113,7 @@ exports.getMainViewProjectData = async (req, res) => {
         let projects = await Project.find().lean();
         if(projects && projects.length) {
             await Promise.all(projects.map(async project => {
+                // based on Payments, for each project find the suppliers that got payed for this project
                 project.suppliers = await Payment.find({"project" : project.project}, 'supplier').lean();
                 // filter to get unique supplier list
                 project.suppliers = project.suppliers.filter((value, index, self) =>
@@ -127,8 +128,6 @@ exports.getMainViewProjectData = async (req, res) => {
                         }, 0)
                         // fatch the supplier-budget from Project table
                         let proj = await Project.findOne({project: project.project})
-
-                        // Need to make it effcient - now takes multiple duplicate supplires based on the payments...
                         let supp = proj.suppliers.filter((item) => {
                             return (item.supplier === supplier.supplier )
                         })
@@ -137,6 +136,8 @@ exports.getMainViewProjectData = async (req, res) => {
                 }
             }))
         }
+
+        // Get the Total payed for each project (total for all suppliers got payed from this project)
         projects = projects.map((item) => {
             const total = item.suppliers.reduce((payed, item1) => {
                 return (item1.payed + payed)
@@ -153,26 +154,43 @@ exports.getMainViewProjectData = async (req, res) => {
 // Build Suppliers structure data from PAYMENTs :   Suppliers => Projects => payments
 exports.getMainViewSupplierData = async (req, res) => {
     try {
-        // let suppliers = await Supplier.find().lean();
+        // Get list of all suppliers from table
         let suppliers = await Table.find({table_id : '1' }).lean();
         suppliers = suppliers.map((item) => {
             return ({id: item._id , supplier : item.description}) // "id" is needed for later use (e.g for delete or update)
         })
         if(suppliers && suppliers.length) {
             await Promise.all(suppliers.map(async supplier => {
+                // based on Payments, for each supplier find the projects that this suppliers get payed for
                 supplier.projects = await Payment.find({"supplier" : supplier.supplier}, 'project').lean();
+
+                // now squeeze the list of projects to unique project list for the supplier
                 supplier.projects = supplier.projects.filter((value, index, self) =>
                     index === self.findIndex((t) => ( t.project === value.project))
                 )
+
+                // Now build payments list for each project (for this main supplier)
                 if(supplier.projects && supplier.projects.length) {
                     await Promise.all(supplier.projects.map(async project=> {
                         project.payments = await Payment.find({supplier: supplier.supplier, project: project.project}).lean();
                         project.payed = project.payments.reduce((payed, item) => {
                             return item.amount + payed
                         }, 0)
+                        // fatch the supplier-budget from Project table
+                        let proj = await Project.findOne({project: project.project})
+                        // console.log(proj.suppliers)
+                        let supp = proj.suppliers.filter((item) => {
+                            return (item.supplier === supplier.supplier)
+                        })
+                        project.budget = supp != [] ? supp[0].budget : 0;
+                        // project.budget = 334455;
+
+
+
                     }));
                 }
             }))
+            // Get the Total payed for each supplier (total for all his projects)
             suppliers = suppliers.map((item) => {
                 const total = item.projects.reduce((payed, item1) => {
                     return (item1.payed + payed)

@@ -12,7 +12,7 @@
 					<template v-slot:top>
 						<v-toolbar flat>
 							<v-toolbar-title>
-                                תשלומים - {{payments[0].project}} - {{payments[0].supplier}}
+                                {{total.toLocaleString()}} - {{payments[0].project}} - {{payments[0].supplier}}
 							</v-toolbar-title>
 							<v-spacer></v-spacer>
 						</v-toolbar>
@@ -53,7 +53,7 @@ import ConfirmDialog from './Common/ConfirmDialog.vue';
 import Payment from "./PaymentForm.vue";
 
 export default {
-    props: ['payments', 'showPaymentsDialog'],
+    props: ['payments', 'showPaymentsDialog', 'total'],
 	components: { ConfirmDialog, Payment },
     data(){
         return {

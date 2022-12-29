@@ -11,11 +11,9 @@
             ></v-select>
             <v-row class="margin-summary">
                 <v-col class="summary">
-                    Budget = {{budget && budget.toLocaleString() || 'N/A'}}
-                    <span>{{'  '}}|{{'  '}}</span>
-                    Paid = {{total && total.toLocaleString() || 'N/A'}}
-                    <span>{{'  '}}|{{'  '}}</span>
-                    Budget Left = {{ budget && total && (budget-total).toLocaleString() || 'N/A'}}
+                    Count = {{count || 'N/A'}}
+                    .........
+                    Total Paid = {{total && total.toLocaleString() || 'N/A'}}
                 </v-col>
             </v-row>
             <payments-list @getData = "getValues" :noData = "true" />

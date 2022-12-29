@@ -3,45 +3,51 @@
     <v-layout row wrap>
 
 
-      <!-- Web-view 
-        <div v-show="!isMobile() && !noData">
-            <v-data-table
-                :headers="headers"
-                disable-pagination
-                hide-default-footer
-                fixed-header
-                height="75vh"
-                :items="payments"
-            >
-					<template v-slot:top>
-						<v-toolbar flat>
-							<v-toolbar-title>All Payments</v-toolbar-title>
-							<v-spacer></v-spacer>
-						</v-toolbar>
-					</template>
-					<template v-slot:[`item.date`]="{ item }">
-						<span>{{ new Date(item.date).toLocaleDateString('he-EG') }}</span>
-					</template>
-
-					<template v-slot:[`item.controls`]="{ item }">
-						<v-btn @click="paymentToUpdate = item" x-small>
-							<v-icon small>mdi-pencil</v-icon>
-						</v-btn>
-                        <v-btn x-small>
-                            <v-icon small @click="deleteItem(item._id)">mdi-delete</v-icon>
-                        </v-btn>
-					</template>
-
-            </v-data-table>
-        </div>
-
-       End-Web-view -->
+      <!-- Web-view -->
+      <div v-show="!isMobile() && !noData">
+        <v-data-table
+            :headers="headers"
+            disable-pagination
+            hide-default-footer
+            fixed-header
+            height="75vh"
+            :items="payments">
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-toolbar-title>All Payments</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <export-excel 
+                :data="payments" 
+                :fields="xlsHeders"
+                type="xlsx"
+                name="ALL PAYMENTS"
+                title="LIST OF ALL PAYMENTS"
+                footer="Here Footer">
+                <v-btn x-small>
+                  <v-icon small>mdi-download</v-icon>
+                </v-btn>
+              </export-excel>
+            </v-toolbar>
+          </template>
+          <template v-slot:[`item.date`]="{ item }">
+            <span>{{ new Date(item.date).toLocaleDateString('he-EG') }}</span>
+          </template>
+          <template v-slot:[`item.controls`]="{ item }">
+            <v-btn @click="paymentToUpdate = item" x-small>
+              <v-icon small>mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn x-small>
+                <v-icon small @click="deleteItem(item._id)">mdi-delete</v-icon>
+            </v-btn>
+          </template>
+        </v-data-table>
+      </div>
+      <!-- End-Web-view -->
 
 
 
       <!-- Mobile-view -->
-      <!-- <v-flex v-show="isMobile()"> -->
-      <v-flex>
+      <v-flex v-show="isMobile()">
         <v-list  v-show="!noData" two-line dense rounded>
           <v-list-item-group v-model="selected" active-class="pink--text">
             <template v-for="(item, index) in payments">
@@ -56,8 +62,8 @@
                       {{ item.date ? "("+ new Date(item.date).toLocaleDateString('he-EG') +")" : "???"}}
                     </v-list-item-subtitle>
                     <v-list-item-subtitle>
-                      {{ item.invoiceId ? "Inv: " + item.invoiceId : "" }}
-                      {{ item.paymentMethod ? "(" + item.paymentMethod + ")" : "" }}
+                      {{ item.invoiceId ? "חשבונית:" + item.invoiceId : "" }}
+                      {{ item.paymentMethod ? "(שיק:" + item.paymentMethod + ")" : "" }}
                     </v-list-item-subtitle>
                     <v-list-item-subtitle class="right">
                       {{ item.remark ? item.remark : "" }}
@@ -88,7 +94,7 @@
           </v-list-item-group>
         </v-list>
       </v-flex>
-    <!-- End Mobile-view -->
+      <!-- End Mobile-view -->
 
     </v-layout>
     <template v-if="paymentToUpdate">
@@ -107,6 +113,9 @@ import { TABLE_MODEL, PAYMENT_MODEL } from '../constants/constants';
 import apiService from "../services/apiService";
 import Payment from "./PaymentForm.vue";
 import ConfirmDialog from './Common/ConfirmDialog.vue';
+import Vue from 'vue'
+import excel from 'vue-excel-export'
+Vue.use(excel)
 
 export default {
     components: { Payment, ConfirmDialog },
@@ -129,6 +138,15 @@ export default {
               { text: 'Date', value: 'date' },
               { text: 'Controls', value: 'controls' },
             ],
+            xlsHeders:{
+              "פרויקט"	:"project", 
+              "סכום"    :"amount",
+              "שיק"     :"paymentMethod",
+              "הערה"    :"remark",
+              "קבלן"   	:"supplier",
+              "חשבונית" :"invoiceId",
+              "תאריך"   :"date",
+            },
             budget: [],
             selectedSupplier: "All",
             selected: [],
@@ -158,10 +176,9 @@ export default {
         },
         async getSuppliersList() {
             try {
-
-                const response = await apiService.get({ model: TABLE_MODEL, table_id: 1});
-                this.suppliersList = response.data.map(supplier => supplier.description);
-                this.$emit("getData", null, null, this.suppliersList);
+              const response = await apiService.get({ model: TABLE_MODEL, table_id: 1});
+              this.suppliersList = response.data.map(supplier => supplier.description);
+              this.$emit("getData", null, null, this.suppliersList);
             } catch (error) {
                 console.log(error);
             }

@@ -37,7 +37,7 @@
 								mobile-breakpoint="0"
 								class="expanded-datatable">
 								<template v-slot:[`item.payed`]="{ item }">
-									<span>{{ item.payed.toLocaleString()  }} </span>
+									<span>{{ item.payed ? item.payed.toLocaleString() : 0 }} </span>
 								</template>
 								<!-- <template v-slot:[`item.controls`]="{ item }">
 									<PaymentsDialog :payments="item.payments"/>
@@ -54,7 +54,7 @@
 						</v-btn>
 					</template>
 					<template v-slot:[`item.payed`]="{ item }">
-						{{item.payed.toLocaleString()}}
+						{{item.payed ? item.payed.toLocaleString() : 0 }}
 					</template>
 				</v-data-table>
 			</v-card>
@@ -81,7 +81,7 @@
 		</v-dialog>
 		<confirm-dialog ref="confirm"/>
 		<div>
-			<PaymentsDialog :payments="projectPayments" :showPaymentsDialog="showPaymentsDialog" @close="onClosePaymentDialog"/>
+			<PaymentsDialog :payments="projectPayments" :showPaymentsDialog="showPaymentsDialog" :total="projectPayed" @close="onClosePaymentDialog"/>
 		</div>
 	</div>
 
@@ -110,8 +110,8 @@ export default {
 			paymentToUpdate: null,
 			dialog: false,
 			showPaymentsDialog: false,
-			selectedProject: {},
 			projectPayments: {},
+			projectPayed: 0,
 			showMessage: false,
 			message: '',
 			headers: [
@@ -122,7 +122,7 @@ export default {
 			],
 			projectHeaders: [
 				{ text: 'Payed', value: 'payed', align:'end' },
-				// { text: 'Budget', value: 'budget', align:'end' },
+				{ text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Project', value: 'project', align:'end'},
 				// { text: '', value: 'controls' },
 			],
@@ -136,6 +136,7 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllSuppliersData();
 				if(response && response.data) {
 					this.suppliers = response.data.suppliers
+					console.log(this.suppliers)
 				} 	// now suppliers is array which includes "supplier" + "id" from TABLE + "projects" (Array)
 					// reason for the "id" is to be able to destinguish between "create" or "update"
 			} catch (error) {
@@ -153,7 +154,7 @@ export default {
             }
         },
 		onProjectSelect(project) {
-			this.selectedProject = project;
+			this.projectPayed = project.payed;
 			this.projectPayments = project.payments;
 			this.showPaymentsDialog = true;
 		},

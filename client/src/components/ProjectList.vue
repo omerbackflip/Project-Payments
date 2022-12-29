@@ -19,10 +19,22 @@
 						<v-toolbar flat>
 							<v-toolbar-title>פרויקטים - {{projects.length}}</v-toolbar-title>
 							<v-spacer></v-spacer>
-							<v-btn @click="updateProject()" small>
+							<v-btn @click="updateProject()" small class="mt-3">
 								<v-icon class="nav-icon" small >mdi-plus</v-icon>
 								הוספת פרויקט
 							</v-btn>
+							<export-excel 
+							:data="projects" 
+							:fields="xlsHeders"
+							type="xlsx"
+							name="PROJECTS"
+							title="This is Title"
+							footer="Here Footer"
+							class="mt-3">
+								<v-btn small class="btn btn-danger ml-2"> 
+									<v-icon>mdi-download</v-icon>
+								</v-btn>
+							</export-excel>
 						</v-toolbar>
 					</template>
 					<template v-slot:expanded-item="{item}">
@@ -68,7 +80,7 @@
 		<project-form ref="projectForm"/>
 		<confirm-dialog ref="confirm"/>
 		<div>
-			<PaymentsDialog :payments="supplierPayments" :showPaymentsDialog="showPaymentsDialog" @close="onClosePaymentDialog"/>
+			<PaymentsDialog :payments="supplierPayments" :showPaymentsDialog="showPaymentsDialog" :total="supplierPayed" @close="onClosePaymentDialog"/>
 		</div>
 	</div>
 </template>
@@ -82,6 +94,9 @@ import specificServiceEndPoints from '../services/specificServiceEndPoints';
 import ProjectForm from './ProjectForm.vue';
 import ConfirmDialog from './Common/ConfirmDialog.vue';
 import PaymentsDialog from './PaymentsDialog.vue'
+import Vue from 'vue'
+import excel from 'vue-excel-export'
+Vue.use(excel)
 
 export default {
 	name: "project-list",
@@ -92,6 +107,7 @@ export default {
 			expanded: [],
 			paymentToUpdate: null,
 			supplierPayments: {},
+			supplierPayed: 0,
 			showPaymentsDialog: false,
 			showMessage: false,
 			message: '',
@@ -103,10 +119,14 @@ export default {
 			],
 			supplierHeaders: [
 				{ text: 'Supplier', value: 'supplier' },
-				// { text: 'Budget', value: 'budget', align:'end' },
+				{ text: 'Budget', value: 'budget', align:'end' },
 				{ text: 'Payed', value: 'payed', align:'end' },
 				// { text: '', value: 'controls' },
 			],
+			xlsHeders:{
+				"פרויקט"	:"project", 
+				"הוצאות"	:"payed",
+			}
 		}
 	},
 
@@ -144,6 +164,7 @@ export default {
 
 		onSupplierSelect(supplier) {
 			this.supplierPayments = supplier.payments;
+			this.supplierPayed = supplier.payed;
 			this.showPaymentsDialog = true;
 		},
 

@@ -89,12 +89,13 @@ export default {
 						break
 					default : alert("switch/case statment not resolved")
 				}
+					console.log(response.data)
 				if (response.data && response.data.success) {
 					this.message = "CSV Data successfully imported";
 					setTimeout(() => {
 						this.toggleDialog();
 					}, 3500);
-					window.location.reload();
+					// window.location.reload();
 				}
 			} catch (error) {
 				console.log(error);
