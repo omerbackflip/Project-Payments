@@ -30,7 +30,7 @@
                             </v-col>
                         </v-row>
                     </div>                    
-                    <v-btn @click="addBudgetField" class="primary" small><v-icon small >mdi-plus</v-icon></v-btn>					
+                    <v-btn @click="addSupplierRow" class="primary" small><v-icon small >mdi-plus</v-icon></v-btn>					
                 </v-container>
 
             </div>
@@ -82,7 +82,7 @@ export default {
                 if(response.data && response.data.data) {
 					this.message = 'Project successfully created/updated!';
                     if(this.project.suppliers.length) {
-                        await specificServiceEndPoints.addProjectBudgetsToSupplier(
+                        await specificServiceEndPoints.addSupplierToProject(
                             response.data.data._id, 
                             this.project.suppliers.map(item => {
                                 return {
@@ -113,7 +113,7 @@ export default {
                 console.log(error);
             }
         },
-		addBudgetField() {
+		addSupplierRow() {
 			this.project.suppliers.push({ supplier: "" , budget: "" });
 		},
 		removeBudgetField(index) {

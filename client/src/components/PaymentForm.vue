@@ -120,7 +120,7 @@ export default {
                     return item.supplier === this.payment.supplier
                 })
                 if(!findSupp) { // Add this supplier to PROJECT table
-                    console.log(currProj.data[0]._id)
+                    // console.log(currProj.data[0]._id)
                     await specificServiceEndPoints.addProjectBudgetsToSupplier(
                         currProj.data[0]._id, 
                         [...currProj.data[0].suppliers, {supplier: this.payment.supplier, budget: 0}]

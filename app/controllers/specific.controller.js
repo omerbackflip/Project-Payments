@@ -113,13 +113,17 @@ exports.getMainViewProjectData = async (req, res) => {
         let projects = await Project.find().lean();
         if(projects && projects.length) {
             await Promise.all(projects.map(async project => {
-                // based on Payments, for each project find the suppliers that got payed for this project
-                project.suppliers = await Payment.find({"project" : project.project}, 'supplier').lean();
-                // filter to get unique supplier list
-                project.suppliers = project.suppliers.filter((value, index, self) =>
-                    index === self.findIndex((t) => ( t.supplier === value.supplier))
-                )
-                // build the suppliers array
+                // ****** Don't need this section because you have already list of suppliers from Project table
+                // // based on Payments, for each project find the suppliers that got payed for this project
+                // project.suppliers = await Payment.find({"project" : project.project}, 'supplier').lean();
+                // // filter to get unique supplier list
+                // project.suppliers = project.suppliers.filter((value, index, self) =>
+                //     index === self.findIndex((t) => ( t.supplier === value.supplier))
+                // )
+                // ****** Don't need this section because you have already list of suppliers from Project table
+
+                
+                // for each supplier retreive it's payments and total payed (all his projects)
                 if(project.suppliers && project.suppliers.length) {
                     await Promise.all(project.suppliers.map(async supplier=> {
                         supplier.payments = await Payment.find({supplier: supplier.supplier , project: project.project}).lean();
@@ -154,6 +158,7 @@ exports.getMainViewProjectData = async (req, res) => {
 // Build Suppliers structure data from PAYMENTs :   Suppliers => Projects => payments
 exports.getMainViewSupplierData = async (req, res) => {
     try {
+        let feedback = true; 
         // Get list of all suppliers from table
         let suppliers = await Table.find({table_id : '1' }).lean();
         suppliers = suppliers.map((item) => {
@@ -178,15 +183,13 @@ exports.getMainViewSupplierData = async (req, res) => {
                         }, 0)
                         // fatch the supplier-budget from Project table
                         let proj = await Project.findOne({project: project.project})
-                        // console.log(proj.suppliers)
                         let supp = proj.suppliers.filter((item) => {
                             return (item.supplier === supplier.supplier)
                         })
-                        project.budget = supp != [] ? supp[0].budget : 0;
-                        // project.budget = 334455;
-
-
-
+                        // if supp.length = 0 => that means there is payment for supplier and missing its name in PROJECT table
+                        if (supp.length) {project.budget = supp[0].budget}
+                            else feedback = "payment for " + supplier.supplier + " in project " + 
+                                            project.project + " while missing in PROJECT table"
                     }));
                 }
             }))
@@ -197,18 +200,18 @@ exports.getMainViewSupplierData = async (req, res) => {
                 }, 0)
                 return ({...item, payed: total})
             })
-            return res.send({success: true, suppliers});
+            return res.send({success: feedback, suppliers});
         }
     } catch (error) {
         console.log(error)
-		res.status(500).send({ message: "Error getting main view supplier data", error });
+		res.status(500).send({ message: "Error getting main view supplier data - maybe there is payment for supplier that does not exsit in project.suppliers", error });
     }
 }
 
-exports.addSupplierBudgetsToProject = async(req,res) => {
+exports.addSupplierToProject = async(req,res) => {
     try {
         const { projectId } = req.params;
-        const supplierBudgets = req.body.map(item => {
+        const newSupplier = req.body.map(item => {
             return {
                 // supplier: mongoose.Types.ObjectId(item.supplier),
                 supplier: item.supplier,
@@ -217,8 +220,8 @@ exports.addSupplierBudgetsToProject = async(req,res) => {
             }
         });
 
-        if(supplierBudgets && supplierBudgets.length) {
-            await Project.updateOne({_id: projectId}, { suppliers: supplierBudgets });
+        if(newSupplier && newSupplier.length) {
+            await Project.updateOne({_id: projectId}, { suppliers: newSupplier });
         }
         return res.send({success: true, message: "Successfully added budgets to suppliers"});
 

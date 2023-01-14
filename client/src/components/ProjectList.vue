@@ -163,9 +163,11 @@ export default {
 		},
 
 		onSupplierSelect(supplier) {
-			this.supplierPayments = supplier.payments;
-			this.supplierPayed = supplier.payed;
-			this.showPaymentsDialog = true;
+			if (supplier.payed) {
+				this.supplierPayments = supplier.payments;
+				this.supplierPayed = supplier.payed;
+				this.showPaymentsDialog = true;
+			} else window.alert("No Payed items for this supplier")
 		},
 
 		onClosePaymentDialog() {

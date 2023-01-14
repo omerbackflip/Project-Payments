@@ -136,7 +136,9 @@ export default {
 				const response = await specificServiceEndPoints.retrieveAllSuppliersData();
 				if(response && response.data) {
 					this.suppliers = response.data.suppliers
-					console.log(this.suppliers)
+					if (response.data.success != true ) {
+						window.alert(response.data.success)
+					}
 				} 	// now suppliers is array which includes "supplier" + "id" from TABLE + "projects" (Array)
 					// reason for the "id" is to be able to destinguish between "create" or "update"
 			} catch (error) {
