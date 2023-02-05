@@ -7,7 +7,7 @@
     >
         <v-card>
             <v-card-title class="text-h5 grey lighten-2">
-                {{!project ? 'New' : 'Update'}} Project
+                {{newProject ? 'New' : 'Update'}} Project
             </v-card-title>
             <div class="field-margin" v-show="showMessage">
                 {{message}}
@@ -48,14 +48,14 @@
 <script>
 import { PROJECT_MODEL, TABLE_MODEL } from "../constants/constants";
 import apiService from "../services/apiService";
-import specificServiceEndPoints from '../services/specificServiceEndPoints';
+// import specificServiceEndPoints from '../services/specificServiceEndPoints';
 
 export default {
     name: "project-form",
     data() {
         return {
             allSuppliersName: [],
-            allSuppliersData: [], // looks that this is not used
+            // allSuppliersData: [], // looks that this is not used
             project: {project: '' , budget: '', suppliers: []},
 			dialog: false,
             resolve: null,      // What is this for ?
@@ -73,26 +73,28 @@ export default {
         async submitProject() {
 			try {
 				let response;
+                console.log(this.project)
 				if(this.newProject) {
-					response = await apiService.create({project: this.project.project , budget: this.project.budget} , {model:PROJECT_MODEL});
+					response = await apiService.create(this.project , {model:PROJECT_MODEL});
+					// response = await apiService.create({project: this.project.project , budget: this.project.budget} , {model:PROJECT_MODEL});
 				} else {
-					response = await apiService.update(this.project._id , { project: this.project.project , budget: this.project.budget } , {model:PROJECT_MODEL});
+					response = await apiService.update(this.project._id , this.project , {model:PROJECT_MODEL});
 				}
-
-                if(response.data && response.data.data) {
-					this.message = 'Project successfully created/updated!';
-                    if(this.project.suppliers.length) {
-                        await specificServiceEndPoints.addSupplierToProject(
-                            response.data.data._id, 
-                            this.project.suppliers.map(item => {
-                                return {
-                                    supplier: item.supplier,
-                                    budget: item.budget
-                                };
-                            })
-                        );
-                    }
-				}
+                console.log(response)
+                // if(response.data && response.data.data) {
+				// 	this.message = 'Project successfully created/updated!';
+                //     if(this.project.suppliers.length) {
+                //         await specificServiceEndPoints.addSupplierToProject(
+                //             response.data.data._id,     // 1st param -> projectId
+                //             this.project.suppliers.map(item => {  // 2nd param -> supplierList
+                //                 return {
+                //                     supplier: item.supplier,
+                //                     budget: item.budget
+                //                 };
+                //             })
+                //         );
+                //     }
+				// }
                 this.showMessage = true;
                 setTimeout(() => {
                     this.dialog = false;
@@ -108,7 +110,7 @@ export default {
             try {
                 const suppliers = await apiService.get({model: TABLE_MODEL, table_id: 1});
                 this.allSuppliersName = suppliers.data.map(supplier => supplier.description);
-                this.allSuppliersData = suppliers.data;
+                // this.allSuppliersData = suppliers.data;  // looks that this is not used
             } catch (error) {
                 console.log(error);
             }
@@ -119,6 +121,8 @@ export default {
 		removeBudgetField(index) {
 			this.project.suppliers.splice(index, 1);
 		},
+
+        // this function called from parant ProjectList.vue
         open(project, newProject) {
             this.newProject = newProject;
             this.project = newProject 

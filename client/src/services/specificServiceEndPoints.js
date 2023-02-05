@@ -35,8 +35,8 @@ class SpecificServiceEndPoints {
 		return await http.get(`${baseUrl}/specific/main-view-supplier-data`);
 	}
 
-	async addSupplierToProject(projectId,supplierBudgets) {
-		return await http.put(`${baseUrl}/specific/add-supplier-to-project/${projectId}`, supplierBudgets);
+	async addSupplierToProject(projectId,supplierList) {
+		return await http.put(`${baseUrl}/specific/add-supplier-to-project/${projectId}`, supplierList);
 	}
 
 }

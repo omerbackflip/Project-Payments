@@ -223,11 +223,11 @@ exports.addSupplierToProject = async(req,res) => {
         if(newSupplier && newSupplier.length) {
             await Project.updateOne({_id: projectId}, { suppliers: newSupplier });
         }
-        return res.send({success: true, message: "Successfully added budgets to suppliers"});
+        return res.send({success: true, message: "Successfully added supplier to PROJECT"});
 
     } catch (error) {
         console.log(error)
-		res.status(500).send({ message: "Error getting suppliers and their associated budgets", error });
+		res.status(500).send({ message: "Error updating PROJECT with associated suppliers", error });
     }
 }
 

@@ -147,13 +147,14 @@ export default {
         copyPayment(){
             delete this.payment._id ;
             this.copyMode = true
-        }
+        },
     },
 
     mounted() {
         this.getAllProjectsAndSuppliers();
 		this.payment = this.paymentToUpdate ?  this.paymentToUpdate : {};
-        this.payment.date = this.paymentToUpdate ? (new Date(this.payment.date)).toISOString().substr(0, 10) : '';
+        // this.payment.date = this.paymentToUpdate ? (new Date(this.payment.date)).toISOString().substr(0, 10) : '';
+        // this.payment.date = this.paymentToUpdate ? (new Date(this.payment.date)).toLocaleDateString('he-EG') : new Date().toLocaleDateString('he-EG');
         this.dialog = true;
 	},
     watch:{
